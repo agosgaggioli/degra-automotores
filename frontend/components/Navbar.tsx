@@ -1,77 +1,608 @@
 'use client';
-import React, { useState, useEffect } from 'react';
 
-const Navbar = () => {
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+import React, {
+  useEffect,
+  useState,
+} from 'react';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+
+import {
+  Menu,
+  X,
+  MessageCircle,
+  ArrowRight,
+  CarFront,
+} from 'lucide-react';
+
+/* =========================================
+   NAVEGACIÓN
+========================================= */
+
+const navigation = [
+  {
+    label: 'Inicio',
+    href: '/',
+  },
+  {
+    label: 'Vehículos',
+    href: '/vehiculos',
+  },
+  {
+    label: 'Financiación',
+    href: '/financiacion',
+  },
+  {
+    label: 'Consignación',
+    href: '/consignacion',
+  },
+  {
+    label: 'Sobre nosotros',
+    href: '/sobre-nosotros',
+  },
+];
+
+/* =========================================
+   NAVBAR
+========================================= */
+
+export default function Navbar() {
+  const pathname = usePathname();
+
+  const [scrolled, setScrolled] =
+    useState(false);
+
+  const [mobileMenuOpen, setMobileMenuOpen] =
+    useState(false);
+
+  /* =========================================
+     SCROLL
+  ========================================= */
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-    }
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+      setScrolled(window.scrollY > 20);
+    };
+
+    handleScroll();
+
+    window.addEventListener(
+      'scroll',
+      handleScroll,
+      { passive: true },
+    );
+
+    return () =>
+      window.removeEventListener(
+        'scroll',
+        handleScroll,
+      );
   }, []);
 
+  /* =========================================
+     CERRAR MENÚ AL CAMBIAR DE PÁGINA
+  ========================================= */
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
+
+  /* =========================================
+     BLOQUEAR SCROLL CON MENÚ MOBILE
+  ========================================= */
+
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow =
+        'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen]);
+
+  /* =========================================
+     LINK ACTIVO
+  ========================================= */
+
+  const isActive = (href: string) => {
+    if (href === '/') {
+      return pathname === '/';
+    }
+
+    return pathname.startsWith(href);
+  };
+
   return (
-    <nav className={`fixed w-full top-0 z-50 transition-colors duration-500 ${scrolled ? 'bg-bluePrimary shadow-lg' : 'bg-transparent'}`}>
-      <div className="max-w-7xl mx-auto flex items-center justify-between p-4">
-        <a href="/" className="text-white font-bold text-xl">Degra Automotores</a>
+    <>
+      <header
+        className={`
+          fixed
+          left-0
+          right-0
+          top-0
+          z-50
+          transition-all
+          duration-300
+          ${
+            scrolled || mobileMenuOpen
+              ? `
+                border-b
+                border-white/10
+                bg-[#071224]/95
+                shadow-[0_8px_30px_rgba(0,0,0,0.18)]
+                backdrop-blur-xl
+              `
+              : `
+                border-b
+                border-transparent
+                bg-[#071224]/40
+                backdrop-blur-sm
+              `
+          }
+        `}
+      >
+        <div className="
+          mx-auto
+          flex
+          h-[72px]
+          max-w-7xl
+          items-center
+          justify-between
+          px-4
+          sm:px-6
+          lg:px-8
+        ">
 
-        {/* Menu Desktop */}
-        <ul className="hidden md:flex space-x-8 text-white font-medium">
-          <li><a href="/" className="hover:text-grayLight transition">Inicio</a></li>
-          <li><a href="/vehiculos" className="hover:text-grayLight transition">Vehículos</a></li>
-          <li><a href="/financiacion" className="hover:text-grayLight transition">Financiación</a></li>
-          <li><a href="/consignacion" className="hover:text-grayLight transition">Consignación</a></li>
-          <li><a href="/sobre-nosotros" className="hover:text-grayLight transition">Sobre Nosotros</a></li>
-          <li><a href="/contacto" className="hover:text-grayLight transition">Contacto</a></li>
-        </ul>
+          {/* =================================
+              MARCA
+          ================================= */}
 
-        {/* Menu Mobile */}
-        <div className="md:hidden flex items-center">
-          <a
-            href="https://wa.me/5493512345678"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-green-500 hover:text-green-600 mr-4"
-            aria-label="WhatsApp"
+          <Link
+            href="/"
+            className="
+              group
+              flex
+              shrink-0
+              items-center
+              gap-2.5
+            "
+            aria-label="Degra Automotores - Inicio"
           >
-            {/* WhatsApp icon */}
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="currentColor" viewBox="0 0 24 24" stroke="none">
-              <path d="M20.52 3.48A11.94 11.94 0 0012 0C5.37 0 0 5.37 0 12a11.96 11.96 0 001.84 6.49L0 24l5.56-1.78A11.95 11.95 0 0012 24c6.63 0 12-5.37 12-12 0-3.19-1.24-6.17-3.48-8.52zM12 21.6a9.59 9.59 0 01-4.91-1.38l-.35-.21-3.3 1.05 1.06-3.21-.22-.34a9.52 9.52 0 01-1.5-5.14c0-5.28 4.28-9.56 9.56-9.56 2.55 0 4.94.99 6.73 2.78a9.42 9.42 0 012.8 6.78c0 5.28-4.29 9.56-9.58 9.56zm5.43-6.68c-.3-.15-1.75-.86-2.02-.96-.27-.1-.47-.15-.67.15-.2.3-.77.96-.95 1.16-.17.2-.34.22-.64.08a8.83 8.83 0 01-2.58-1.59 9.91 9.91 0 01-1.85-2.29c-.2-.34 0-.52.15-.67.15-.16.3-.34.46-.51.15-.16.2-.26.3-.43.1-.17.05-.3-.02-.44-.06-.15-.67-1.62-.91-2.22-.24-.58-.48-.5-.66-.51-.17-.01-.37-.02-.57-.02-.2 0-.52.08-.8.4-.28.33-1.07 1.05-1.07 2.54 0 1.49 1.1 2.94 1.26 3.14.17.2 2.16 3.3 5.23 4.62.73.31 1.3.49 1.75.63.74.22 1.42.19 1.96.11.6-.09 1.75-.71 2-.14.25.56 1.75 2.54 2 2.72.25.18.4.3.57.24.17-.07.52-.18 1-.7.48-.6.66-1.2.74-1.33.07-.12.07-.21.05-.3-.03-.08-.27-.13-.57-.27z" />
-            </svg>
-          </a>
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle Menu"
-            className="text-white focus:outline-none"
+            <div className="
+              flex
+              h-9
+              w-9
+              items-center
+              justify-center
+              rounded-lg
+              bg-[#1f4e96]
+              text-white
+              transition
+              duration-300
+              group-hover:bg-[#295eaa]
+            ">
+              <CarFront size={18} />
+            </div>
+
+            <div className="leading-none">
+
+              <p className="
+                text-sm
+                font-bold
+                tracking-tight
+                text-white
+                sm:text-[15px]
+              ">
+                Degra Automotores
+              </p>
+
+              <p className="
+                mt-1
+                hidden
+                text-[8px]
+                font-medium
+                uppercase
+                tracking-[0.18em]
+                text-slate-500
+                sm:block
+              ">
+                Tu próximo vehículo
+              </p>
+
+            </div>
+          </Link>
+
+          {/* =================================
+              DESKTOP NAVIGATION
+          ================================= */}
+
+          <nav
+            className="
+              hidden
+              items-center
+              lg:flex
+            "
+            aria-label="Navegación principal"
           >
-            <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" className="w-7 h-7">
+            <div className="
+              flex
+              items-center
+              rounded-xl
+              border
+              border-white/[0.07]
+              bg-white/[0.025]
+              p-1
+            ">
+
+              {navigation.map((item) => {
+                const active =
+                  isActive(item.href);
+
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`
+                      relative
+                      flex
+                      h-8
+                      items-center
+                      rounded-lg
+                      px-3
+                      text-[12px]
+                      font-medium
+                      transition-all
+                      duration-200
+                      ${
+                        active
+                          ? `
+                            bg-white/[0.08]
+                            text-white
+                          `
+                          : `
+                            text-slate-400
+                            hover:bg-white/[0.04]
+                            hover:text-white
+                          `
+                      }
+                    `}
+                  >
+                    {item.label}
+
+                    {active && (
+                      <span className="
+                        absolute
+                        bottom-[3px]
+                        left-1/2
+                        h-[2px]
+                        w-3
+                        -translate-x-1/2
+                        rounded-full
+                        bg-blue-400
+                      " />
+                    )}
+
+                  </Link>
+                );
+              })}
+
+            </div>
+          </nav>
+
+          {/* =================================
+              ACCIONES DESKTOP
+          ================================= */}
+
+          <div className="
+            hidden
+            items-center
+            gap-2
+            lg:flex
+          ">
+
+            {/* WHATSAPP */}
+
+            <a
+              href="https://wa.me/5493512345678"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Contactar por WhatsApp"
+              className="
+                flex
+                h-9
+                w-9
+                items-center
+                justify-center
+                rounded-lg
+                border
+                border-white/10
+                bg-white/[0.03]
+                text-slate-400
+                transition
+                hover:border-[#3169b7]
+                hover:bg-[#1f4e96]
+                hover:text-white
+              "
+            >
+              <MessageCircle size={16} />
+            </a>
+
+            {/* CONTACTO */}
+
+            <Link
+              href="/contacto"
+              className="
+                flex
+                h-9
+                items-center
+                justify-center
+                gap-1.5
+                rounded-lg
+                bg-[#1f4e96]
+                px-4
+                text-xs
+                font-semibold
+                text-white
+                transition
+                hover:bg-[#295eaa]
+              "
+            >
+              Contactanos
+
+              <ArrowRight size={13} />
+            </Link>
+
+          </div>
+
+          {/* =================================
+              MOBILE ACTIONS
+          ================================= */}
+
+          <div className="
+            flex
+            items-center
+            gap-2
+            lg:hidden
+          ">
+
+            <a
+              href="https://wa.me/5493512345678"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Contactar por WhatsApp"
+              className="
+                flex
+                h-9
+                w-9
+                items-center
+                justify-center
+                rounded-lg
+                border
+                border-white/10
+                bg-white/[0.04]
+                text-slate-300
+                transition
+                hover:bg-[#1f4e96]
+                hover:text-white
+              "
+            >
+              <MessageCircle size={16} />
+            </a>
+
+            <button
+              type="button"
+              onClick={() =>
+                setMobileMenuOpen(
+                  (prev) => !prev,
+                )
+              }
+              aria-label={
+                mobileMenuOpen
+                  ? 'Cerrar menú'
+                  : 'Abrir menú'
+              }
+              aria-expanded={
+                mobileMenuOpen
+              }
+              className="
+                flex
+                h-9
+                w-9
+                items-center
+                justify-center
+                rounded-lg
+                border
+                border-white/10
+                bg-white/[0.04]
+                text-white
+                transition
+                hover:bg-white/[0.08]
+              "
+            >
               {mobileMenuOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                <X size={18} />
               ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                <Menu size={18} />
               )}
-            </svg>
-          </button>
+            </button>
+
+          </div>
+
         </div>
 
-      </div>
+        {/* =================================
+            MOBILE MENU
+        ================================= */}
 
-      {/* Mobile Menu */}
+        <div
+          className={`
+            overflow-hidden
+            border-white/10
+            bg-[#071224]
+            transition-all
+            duration-300
+            lg:hidden
+            ${
+              mobileMenuOpen
+                ? `
+                  max-h-[520px]
+                  border-t
+                  opacity-100
+                `
+                : `
+                  max-h-0
+                  border-t-0
+                  opacity-0
+                `
+            }
+          `}
+        >
+          <div className="
+            mx-auto
+            max-w-7xl
+            px-4
+            pb-5
+            pt-3
+            sm:px-6
+          ">
+
+            {/* LINKS */}
+
+            <nav
+              className="space-y-1"
+              aria-label="Navegación móvil"
+            >
+              {navigation.map((item) => {
+                const active =
+                  isActive(item.href);
+
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`
+                      flex
+                      h-11
+                      items-center
+                      justify-between
+                      rounded-lg
+                      px-3
+                      text-sm
+                      font-medium
+                      transition
+                      ${
+                        active
+                          ? `
+                            bg-[#1f4e96]/15
+                            text-white
+                          `
+                          : `
+                            text-slate-400
+                            hover:bg-white/[0.04]
+                            hover:text-white
+                          `
+                      }
+                    `}
+                  >
+                    <span className="flex items-center gap-3">
+
+                      {active && (
+                        <span className="
+                          h-1.5
+                          w-1.5
+                          rounded-full
+                          bg-blue-400
+                        " />
+                      )}
+
+                      {item.label}
+
+                    </span>
+
+                    <ArrowRight
+                      size={13}
+                      className={
+                        active
+                          ? 'text-blue-300'
+                          : 'text-slate-600'
+                      }
+                    />
+
+                  </Link>
+                );
+              })}
+            </nav>
+
+            {/* SEPARADOR */}
+
+            <div className="my-3 h-px bg-white/10" />
+
+            {/* CONTACTO */}
+
+            <Link
+              href="/contacto"
+              className="
+                flex
+                h-11
+                w-full
+                items-center
+                justify-center
+                gap-2
+                rounded-lg
+                bg-[#1f4e96]
+                text-sm
+                font-semibold
+                text-white
+                transition
+                hover:bg-[#295eaa]
+              "
+            >
+              Contactanos
+
+              <ArrowRight size={14} />
+            </Link>
+
+            <p className="
+              mt-3
+              text-center
+              text-[10px]
+              text-slate-600
+            ">
+              Degra Automotores · Córdoba
+            </p>
+
+          </div>
+        </div>
+
+      </header>
+
+      {/* =====================================
+          OVERLAY MOBILE
+      ===================================== */}
+
       {mobileMenuOpen && (
-        <ul className="md:hidden bg-bluePrimary text-white p-4 space-y-4 font-semibold">
-          <li><a href="/" className="block hover:text-grayLight transition" onClick={() => setMobileMenuOpen(false)}>Inicio</a></li>
-          <li><a href="/vehiculos" className="block hover:text-grayLight transition" onClick={() => setMobileMenuOpen(false)}>Vehículos</a></li>
-          <li><a href="/financiacion" className="block hover:text-grayLight transition" onClick={() => setMobileMenuOpen(false)}>Financiación</a></li>
-          <li><a href="/consignacion" className="block hover:text-grayLight transition" onClick={() => setMobileMenuOpen(false)}>Consignación</a></li>
-          <li><a href="/sobre-nosotros" className="block hover:text-grayLight transition" onClick={() => setMobileMenuOpen(false)}>Sobre Nosotros</a></li>
-          <li><a href="/contacto" className="block hover:text-grayLight transition" onClick={() => setMobileMenuOpen(false)}>Contacto</a></li>
-        </ul>
+        <button
+          type="button"
+          aria-label="Cerrar menú"
+          onClick={() =>
+            setMobileMenuOpen(false)
+          }
+          className="
+            fixed
+            inset-0
+            z-40
+            bg-black/50
+            backdrop-blur-[2px]
+            lg:hidden
+          "
+        />
       )}
-    </nav>
-  )
-}
 
-export default Navbar;
+    </>
+  );
+}

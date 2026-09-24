@@ -1,11 +1,29 @@
 'use client';
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
+
 import useEmblaCarousel from 'embla-carousel-react';
-import { motion } from 'framer-motion';
+
 import Image from 'next/image';
 import Link from 'next/link';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+
+import {
+  ChevronLeft,
+  ChevronRight,
+  ArrowRight,
+  Landmark,
+  CalendarDays,
+  Percent,
+  WalletCards,
+} from 'lucide-react';
+
+/* =========================================
+   FINANCIACIONES
+========================================= */
 
 const financings = [
   {
@@ -16,7 +34,8 @@ const financings = [
     cuotas: 24,
     tasa: '18%',
     anticipo: '30%',
-    beneficio: 'Tasa fija y cuotas sin sorpresas.',
+    beneficio:
+      'Tasa fija y cuotas sin sorpresas.',
     url: '/financiacion',
   },
   {
@@ -27,7 +46,8 @@ const financings = [
     cuotas: 36,
     tasa: '20%',
     anticipo: '25%',
-    beneficio: 'Financiación flexible con aprobación rápida.',
+    beneficio:
+      'Financiación flexible con aprobación rápida.',
     url: '/financiacion',
   },
   {
@@ -38,29 +58,37 @@ const financings = [
     cuotas: 30,
     tasa: '22%',
     anticipo: '35%',
-    beneficio: 'Pago anticipado sin costos extra.',
+    beneficio:
+      'Pago anticipado sin costos extra.',
     url: '/financiacion',
   },
 ];
 
+/* =========================================
+   COMPONENTE
+========================================= */
+
 export default function FinancingCarousel() {
-  const [emblaRef, emblaApi] = useEmblaCarousel({
-    loop: true,
-    align: 'center',
-    slidesToScroll: 1,
-    skipSnaps: false,
-  });
+  const [emblaRef, emblaApi] =
+    useEmblaCarousel({
+      loop: true,
+      align: 'start',
+      slidesToScroll: 1,
+    });
 
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [selectedIndex, setSelectedIndex] =
+    useState(0);
 
-  /*
-   * Actualiza la card seleccionada cada vez
-   * que Embla cambia de posición.
-   */
+  /* =========================================
+     SELECCIÓN
+  ========================================= */
+
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
 
-    setSelectedIndex(emblaApi.selectedScrollSnap());
+    setSelectedIndex(
+      emblaApi.selectedScrollSnap(),
+    );
   }, [emblaApi]);
 
   useEffect(() => {
@@ -68,18 +96,33 @@ export default function FinancingCarousel() {
 
     onSelect();
 
-    emblaApi.on('select', onSelect);
-    emblaApi.on('reInit', onSelect);
+    emblaApi.on(
+      'select',
+      onSelect,
+    );
+
+    emblaApi.on(
+      'reInit',
+      onSelect,
+    );
 
     return () => {
-      emblaApi.off('select', onSelect);
-      emblaApi.off('reInit', onSelect);
+      emblaApi.off(
+        'select',
+        onSelect,
+      );
+
+      emblaApi.off(
+        'reInit',
+        onSelect,
+      );
     };
   }, [emblaApi, onSelect]);
 
-  /*
-   * Autoplay simple.
-   */
+  /* =========================================
+     AUTOPLAY
+  ========================================= */
+
   useEffect(() => {
     if (!emblaApi) return;
 
@@ -87,327 +130,532 @@ export default function FinancingCarousel() {
       emblaApi.scrollNext();
     }, 6500);
 
-    return () => clearInterval(timer);
+    return () =>
+      clearInterval(timer);
   }, [emblaApi]);
 
-  /*
-   * Flechas.
-   */
-  const scrollPrev = useCallback(() => {
-    if (!emblaApi) return;
+  /* =========================================
+     NAVEGACIÓN
+  ========================================= */
 
-    emblaApi.scrollPrev();
+  const scrollPrev = useCallback(() => {
+    emblaApi?.scrollPrev();
   }, [emblaApi]);
 
   const scrollNext = useCallback(() => {
-    if (!emblaApi) return;
-
-    emblaApi.scrollNext();
+    emblaApi?.scrollNext();
   }, [emblaApi]);
 
-  /*
-   * Permite tocar una card para seleccionarla
-   * antes de entrar al detalle.
-   */
   const selectSlide = useCallback(
     (index: number) => {
-      if (!emblaApi) return;
-
-      emblaApi.scrollTo(index);
+      emblaApi?.scrollTo(index);
     },
-    [emblaApi]
+    [emblaApi],
   );
 
-  return (
-    <section className="relative overflow-hidden py-16">
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Título */}
-        <div className="mx-auto mb-10 max-w-2xl text-center">
-          <h2 className="text-3xl font-bold text-gray-900 md:text-4xl">
-            Financiaciones pensadas para vos
-          </h2>
+  /* =========================================
+     RENDER
+  ========================================= */
 
-          <p className="mt-4 text-gray-600">
-            Elegí la opción que mejor se adapte a tu próximo vehículo.
-          </p>
+  return (
+    <section className="relative overflow-hidden bg-[#071224] py-14">
+
+      {/* =====================================
+          FONDO
+      ===================================== */}
+
+      <div className="pointer-events-none absolute -left-48 top-0 h-[420px] w-[420px] rounded-full bg-[#1f4e96]/10 blur-[130px]" />
+
+      <div className="pointer-events-none absolute -right-48 bottom-0 h-[420px] w-[420px] rounded-full bg-[#163b71]/10 blur-[130px]" />
+
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+
+        {/* =====================================
+            HEADER
+        ===================================== */}
+
+        <div className="mb-7 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+
+          <div>
+
+            <div className="flex items-center gap-2">
+
+              <Landmark
+                size={14}
+                className="text-blue-300"
+              />
+
+              <span className="text-xs font-semibold uppercase tracking-[0.18em] text-blue-300">
+                Financiación
+              </span>
+
+            </div>
+
+            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+              Opciones para llegar a tu próximo vehículo
+            </h2>
+
+            <p className="mt-2 max-w-xl text-sm leading-6 text-slate-400">
+              Conocé las alternativas disponibles y
+              encontrá una financiación que se adapte a vos.
+            </p>
+
+          </div>
+
+          {/* FLECHAS */}
+
+          <div className="hidden items-center gap-2 sm:flex">
+
+            <button
+              type="button"
+              onClick={scrollPrev}
+              aria-label="Financiación anterior"
+              className="
+                flex
+                h-9
+                w-9
+                items-center
+                justify-center
+                rounded-lg
+                border
+                border-white/10
+                bg-[#0c192d]
+                text-slate-400
+                transition
+                hover:border-[#3169b7]
+                hover:text-white
+              "
+            >
+              <ChevronLeft size={17} />
+            </button>
+
+            <button
+              type="button"
+              onClick={scrollNext}
+              aria-label="Financiación siguiente"
+              className="
+                flex
+                h-9
+                w-9
+                items-center
+                justify-center
+                rounded-lg
+                border
+                border-white/10
+                bg-[#0c192d]
+                text-slate-400
+                transition
+                hover:border-[#3169b7]
+                hover:text-white
+              "
+            >
+              <ChevronRight size={17} />
+            </button>
+
+          </div>
+
         </div>
 
-        {/* Carrusel */}
-        <div className="relative">
-          {/*
-           * IMPORTANTE:
-           *
-           * overflow-hidden es necesario para Embla.
-           * py-8 genera espacio para que la card pueda
-           * crecer con scale sin quedar cortada.
-           */}
-          <div
-            ref={emblaRef}
-            className="overflow-hidden px-2 py-8 md:px-14"
-          >
-            <div className="flex touch-pan-y">
-              {financings.map((fin, index) => {
-                const isSelected = index === selectedIndex;
+        {/* =====================================
+            CARRUSEL
+        ===================================== */}
+
+        <div
+          ref={emblaRef}
+          className="overflow-hidden"
+        >
+
+          <div className="-ml-3 flex touch-pan-y">
+
+            {financings.map(
+              (fin, index) => {
+
+                const isSelected =
+                  selectedIndex === index;
 
                 return (
                   <div
                     key={fin.id}
                     className="
                       min-w-0
-                      flex-[0_0_86%]
-                      px-3
-                      sm:flex-[0_0_65%]
-                      md:flex-[0_0_48%]
+                      flex-[0_0_88%]
+                      pl-3
+                      sm:flex-[0_0_55%]
+                      md:flex-[0_0_45%]
                       lg:flex-[0_0_36%]
                     "
                   >
-                    <motion.div
-                      onClick={() => selectSlide(index)}
-                      animate={{
-                        scale: isSelected ? 1.06 : 0.94,
-                        opacity: isSelected ? 1 : 0.68,
-                        y: isSelected ? 0 : 6,
-                      }}
-                      whileHover={{
-                        scale: isSelected ? 1.07 : 0.98,
-                      }}
-                      transition={{
-                        duration: 0.35,
-                        ease: 'easeOut',
-                      }}
+
+                    {/* CARD */}
+
+                    <article
+                      onClick={() =>
+                        selectSlide(index)
+                      }
                       className={`
-                        relative
+                        group
+                        flex
                         h-full
                         cursor-pointer
+                        flex-col
                         overflow-hidden
-                        rounded-2xl
+                        rounded-xl
                         border
-                        bg-white
-                        transition-shadow
+                        bg-[#0c192d]
+                        transition-all
                         duration-300
+                        hover:-translate-y-1
+                        hover:border-[#3169b7]/70
+
                         ${
                           isSelected
-                            ? 'border-bluePrimary shadow-xl'
-                            : 'border-gray-200 shadow-md'
+                            ? `
+                              border-[#3169b7]/60
+                              shadow-[0_18px_45px_-25px_rgba(49,105,183,0.55)]
+                            `
+                            : `
+                              border-white/10
+                            `
                         }
                       `}
                     >
-                      {/* Badge seleccionado */}
-                      {isSelected && (
-                        <div className="absolute right-4 top-4 z-10">
-                          <span className="rounded-full bg-bluePrimary px-3 py-1 text-xs font-semibold text-white shadow">
-                            Destacada
-                          </span>
-                        </div>
-                      )}
 
-                      <div className="flex min-h-[390px] flex-col p-6">
-                        {/* Logo */}
-                        <div className="mb-6 flex h-20 items-center justify-center">
-                          <div className="relative h-16 w-40">
+                      {/* =================================
+                          LOGO
+                      ================================= */}
+
+                      <div className="border-b border-white/10 p-3">
+
+                        <div
+                          className="
+                            relative
+                            flex
+                            h-[82px]
+                            items-center
+                            justify-center
+                            overflow-hidden
+                            rounded-lg
+                            bg-white
+                            px-5
+                          "
+                        >
+
+                          <div className="relative h-12 w-[145px]">
+
                             <Image
                               src={fin.logo}
                               alt={fin.bank}
                               fill
                               className="object-contain"
-                              sizes="160px"
+                              sizes="145px"
                               priority={index === 0}
                             />
+
                           </div>
+
+                          {/* INDICADOR SELECCIONADO */}
+
+                          {isSelected && (
+                            <span
+                              className="
+                                absolute
+                                right-2
+                                top-2
+                                h-1.5
+                                w-1.5
+                                rounded-full
+                                bg-[#1f4e96]
+                              "
+                            />
+                          )}
+
                         </div>
 
-                        {/* Banco */}
-                        <p className="mb-2 text-center text-sm font-medium uppercase tracking-wide text-gray-500">
+                      </div>
+
+                      {/* =================================
+                          INFORMACIÓN
+                      ================================= */}
+
+                      <div className="flex flex-1 flex-col p-4">
+
+                        <p
+                          className="
+                            text-[9px]
+                            font-bold
+                            uppercase
+                            tracking-[0.15em]
+                            text-blue-300
+                          "
+                        >
                           {fin.bank}
                         </p>
 
-                        {/* Nombre */}
-                        <h3 className="mb-4 text-center text-xl font-bold text-gray-900">
+                        <h3
+                          className="
+                            mt-1
+                            text-base
+                            font-semibold
+                            text-white
+                          "
+                        >
                           {fin.name}
                         </h3>
 
-                        {/* Datos */}
-                        <div className="mb-5 flex items-center justify-center gap-3 text-sm text-gray-600">
-                          <span className="font-medium">
-                            {fin.cuotas} cuotas
-                          </span>
-
-                          <span className="h-1 w-1 rounded-full bg-gray-400" />
-
-                          <span className="font-medium">
-                            Tasa {fin.tasa}
-                          </span>
-                        </div>
-
-                        {/* Anticipo */}
-                        <div className="mb-4 rounded-xl bg-gray-50 px-4 py-3 text-center">
-                          <span className="text-sm text-gray-500">
-                            Anticipo desde
-                          </span>
-
-                          <p className="mt-1 text-xl font-bold text-blueSecondary">
-                            {fin.anticipo}
-                          </p>
-                        </div>
-
-                        {/* Beneficio */}
-                        <p className="mb-6 text-center text-sm leading-relaxed text-gray-600">
+                        <p
+                          className="
+                            mt-2
+                            min-h-[40px]
+                            text-xs
+                            leading-5
+                            text-slate-500
+                          "
+                        >
                           {fin.beneficio}
                         </p>
 
-                        {/* CTA */}
+                        {/* =================================
+                            DATOS
+                        ================================= */}
+
+                        <div
+                          className="
+                            mt-4
+                            grid
+                            grid-cols-3
+                            overflow-hidden
+                            rounded-lg
+                            border
+                            border-white/10
+                          "
+                        >
+
+                          <FinancingData
+                            icon={
+                              <CalendarDays
+                                size={13}
+                              />
+                            }
+                            label="Cuotas"
+                            value={`${fin.cuotas}`}
+                          />
+
+                          <FinancingData
+                            icon={
+                              <Percent
+                                size={13}
+                              />
+                            }
+                            label="Tasa"
+                            value={fin.tasa}
+                          />
+
+                          <FinancingData
+                            icon={
+                              <WalletCards
+                                size={13}
+                              />
+                            }
+                            label="Anticipo"
+                            value={fin.anticipo}
+                          />
+
+                        </div>
+
+                        {/* =================================
+                            CTA
+                        ================================= */}
+
                         <Link
                           href={fin.url}
-                          onClick={(e) => e.stopPropagation()}
+                          onClick={(e) =>
+                            e.stopPropagation()
+                          }
                           className="
-                            mt-auto
-                            block
+                            mt-4
+                            flex
+                            h-9
                             w-full
-                            rounded-xl
-                            bg-bluePrimary
-                            px-5
-                            py-3
-                            text-center
+                            items-center
+                            justify-between
+                            rounded-lg
+                            border
+                            border-white/10
+                            bg-white/[0.025]
+                            px-3
+                            text-xs
                             font-semibold
-                            text-white
-                            transition-all
-                            duration-300
-                            hover:-translate-y-0.5
-                            hover:bg-blueSecondary
-                            hover:shadow-lg
+                            text-slate-300
+                            transition
+                            hover:border-[#3169b7]
+                            hover:bg-[#1f4e96]
+                            hover:text-white
                           "
                         >
                           Ver financiación
+
+                          <ArrowRight
+                            size={13}
+                            className="
+                              transition-transform
+                              group-hover:translate-x-0.5
+                            "
+                          />
                         </Link>
+
                       </div>
-                    </motion.div>
+
+                    </article>
+
                   </div>
                 );
-              })}
-            </div>
+              },
+            )}
+
           </div>
 
-          {/* Flecha izquierda */}
-          <button
-            type="button"
-            aria-label="Anterior financiación"
-            onClick={scrollPrev}
-            className="
-              absolute
-              left-0
-              top-1/2
-              z-30
-              hidden
-              -translate-y-1/2
-              items-center
-              justify-center
-              rounded-full
-              border
-              border-gray-100
-              bg-white
-              p-3
-              shadow-lg
-              transition-all
-              duration-300
-              hover:scale-110
-              hover:bg-gray-50
-              md:flex
-            "
-          >
-            <ChevronLeft
-              size={26}
-              strokeWidth={2}
-              className="text-blueSecondary"
-            />
-          </button>
-
-          {/* Flecha derecha */}
-          <button
-            type="button"
-            aria-label="Siguiente financiación"
-            onClick={scrollNext}
-            className="
-              absolute
-              right-0
-              top-1/2
-              z-30
-              hidden
-              -translate-y-1/2
-              items-center
-              justify-center
-              rounded-full
-              border
-              border-gray-100
-              bg-white
-              p-3
-              shadow-lg
-              transition-all
-              duration-300
-              hover:scale-110
-              hover:bg-gray-50
-              md:flex
-            "
-          >
-            <ChevronRight
-              size={26}
-              strokeWidth={2}
-              className="text-blueSecondary"
-            />
-          </button>
         </div>
 
-        {/* Indicadores */}
-        <div className="mt-4 flex items-center justify-center gap-2">
-          {financings.map((fin, index) => {
-            const isSelected = index === selectedIndex;
+        {/* =====================================
+            NAVEGACIÓN INFERIOR
+        ===================================== */}
 
-            return (
-              <button
-                key={fin.id}
-                type="button"
-                aria-label={`Ir a financiación ${index + 1}`}
-                onClick={() => emblaApi?.scrollTo(index)}
-                className={`
-                  h-2.5
-                  rounded-full
-                  transition-all
-                  duration-300
-                  ${
-                    isSelected
-                      ? 'w-8 bg-bluePrimary'
-                      : 'w-2.5 bg-gray-300 hover:bg-gray-400'
-                  }
-                `}
-              />
-            );
-          })}
-        </div>
+        <div
+          className="
+            mt-6
+            flex
+            items-center
+            justify-between
+            gap-4
+          "
+        >
 
-        {/* Botón final */}
-        <div className="mt-10 text-center">
+          {/* INDICADORES */}
+
+          <div className="flex items-center gap-1.5">
+
+            {financings.map(
+              (fin, index) => {
+
+                const isSelected =
+                  selectedIndex === index;
+
+                return (
+                  <button
+                    key={fin.id}
+                    type="button"
+                    onClick={() =>
+                      emblaApi?.scrollTo(index)
+                    }
+                    aria-label={`Ir a financiación ${index + 1}`}
+                    className={`
+                      h-1.5
+                      rounded-full
+                      transition-all
+                      duration-300
+
+                      ${
+                        isSelected
+                          ? 'w-6 bg-[#1f4e96]'
+                          : 'w-1.5 bg-white/20 hover:bg-white/40'
+                      }
+                    `}
+                  />
+                );
+              },
+            )}
+
+          </div>
+
+          {/* VER TODAS */}
+
           <Link
             href="/financiacion"
             className="
               inline-flex
               items-center
-              justify-center
-              rounded-xl
-              bg-blueSecondary
-              px-8
-              py-3
+              gap-1.5
+              text-xs
               font-semibold
-              text-white
-              transition-all
-              duration-300
-              hover:-translate-y-0.5
-              hover:bg-bluePrimary
-              hover:shadow-lg
+              text-slate-400
+              transition
+              hover:text-white
             "
           >
             Ver todas las financiaciones
+
+            <ArrowRight size={13} />
           </Link>
+
         </div>
+
       </div>
+
     </section>
+  );
+}
+
+/* =========================================
+   FINANCING DATA
+========================================= */
+
+interface FinancingDataProps {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+}
+
+function FinancingData({
+  icon,
+  label,
+  value,
+}: FinancingDataProps) {
+  return (
+    <div
+      className="
+        border-r
+        border-white/10
+        px-2
+        py-2.5
+        text-center
+        last:border-r-0
+      "
+    >
+
+      <div
+        className="
+          flex
+          items-center
+          justify-center
+          gap-1
+          text-blue-300
+        "
+      >
+        {icon}
+
+        <span
+          className="
+            text-[8px]
+            uppercase
+            tracking-wide
+            text-slate-600
+          "
+        >
+          {label}
+        </span>
+      </div>
+
+      <p
+        className="
+          mt-1
+          text-[11px]
+          font-semibold
+          text-slate-300
+        "
+      >
+        {value}
+      </p>
+
+    </div>
   );
 }

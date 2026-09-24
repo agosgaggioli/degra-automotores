@@ -8,6 +8,7 @@ import React, {
 
 import Image from 'next/image';
 import Link from 'next/link';
+
 import { motion } from 'framer-motion';
 import useEmblaCarousel from 'embla-carousel-react';
 
@@ -24,6 +25,10 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
+
+/* =========================================
+   HISTORIA
+========================================= */
 
 const history = [
   {
@@ -56,32 +61,40 @@ const history = [
   },
 ];
 
+/* =========================================
+   VALORES
+========================================= */
+
 const values = [
   {
     icon: ShieldCheck,
     title: 'Confianza',
     description:
-      'Buscamos relaciones claras y transparentes en cada operación.',
+      'Relaciones claras y transparentes en cada operación.',
   },
   {
     icon: HeartHandshake,
     title: 'Acompañamiento',
     description:
-      'No te dejamos solo. Estamos presentes antes, durante y después.',
+      'Estamos presentes antes, durante y después.',
   },
   {
     icon: Star,
     title: 'Calidad',
     description:
-      'Seleccionamos unidades y cuidamos cada detalle de la experiencia.',
+      'Seleccionamos unidades y cuidamos cada detalle.',
   },
   {
     icon: TrendingUp,
     title: 'Crecimiento',
     description:
-      'Nos mueve mejorar constantemente y seguir construyendo algo grande.',
+      'Buscamos mejorar y seguir construyendo todos los días.',
   },
 ];
+
+/* =========================================
+   STATS
+========================================= */
 
 const stats = [
   {
@@ -117,7 +130,7 @@ export default function SobreNosotrosPage() {
     if (!emblaApi) return;
 
     setSelectedIndex(
-      emblaApi.selectedScrollSnap()
+      emblaApi.selectedScrollSnap(),
     );
   }, [emblaApi]);
 
@@ -133,7 +146,7 @@ export default function SobreNosotrosPage() {
     (index: number) => {
       emblaApi?.scrollTo(index);
     },
-    [emblaApi]
+    [emblaApi],
   );
 
   useEffect(() => {
@@ -143,23 +156,23 @@ export default function SobreNosotrosPage() {
 
     emblaApi.on(
       'select',
-      onSelect
+      onSelect,
     );
 
     emblaApi.on(
       'reInit',
-      onSelect
+      onSelect,
     );
 
     return () => {
       emblaApi.off(
         'select',
-        onSelect
+        onSelect,
       );
 
       emblaApi.off(
         'reInit',
-        onSelect
+        onSelect,
       );
     };
   }, [emblaApi, onSelect]);
@@ -167,110 +180,120 @@ export default function SobreNosotrosPage() {
   useEffect(() => {
     if (!emblaApi) return;
 
-    const interval =
-      setInterval(() => {
-        emblaApi.scrollNext();
-      }, 6500);
+    const interval = setInterval(() => {
+      emblaApi.scrollNext();
+    }, 6500);
 
     return () =>
       clearInterval(interval);
   }, [emblaApi]);
 
   return (
-    <main className="min-h-screen bg-[#071224]">
+    <main className="min-h-screen bg-[#071224] text-white">
 
-      {/* ========================= */}
-      {/* HERO */}
-      {/* ========================= */}
+      {/* =====================================
+          HERO
+      ===================================== */}
 
-      <section className="relative overflow-hidden bg-[#071224] pb-20 pt-14 text-white">
+      <section className="relative overflow-hidden border-b border-white/10">
 
-        <div className="pointer-events-none absolute -left-32 top-10 h-96 w-96 rounded-full bg-[#1f4e96]/20 blur-3xl" />
+        <div className="pointer-events-none absolute -left-40 top-10 h-[420px] w-[420px] rounded-full bg-[#1f4e96]/20 blur-[130px]" />
 
-        <div className="pointer-events-none absolute -right-32 bottom-0 h-96 w-96 rounded-full bg-[#163b71]/20 blur-3xl" />
+        <div className="pointer-events-none absolute -right-40 bottom-0 h-[400px] w-[400px] rounded-full bg-[#163b71]/15 blur-[120px]" />
 
-        <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
+        <div className="
+          relative
+          mx-auto
+          grid
+          max-w-7xl
+          items-center
+          gap-10
+          px-4
+          pb-12
+          pt-28
+          sm:px-6
+          lg:grid-cols-[1fr_0.9fr]
+          lg:px-8
+        ">
 
           {/* TEXTO */}
 
           <motion.div
             initial={{
               opacity: 0,
-              y: 25,
+              y: 20,
             }}
             animate={{
               opacity: 1,
               y: 0,
             }}
             transition={{
-              duration: 0.7,
+              duration: 0.6,
             }}
           >
 
-            <span className="text-sm font-semibold uppercase tracking-[0.22em] text-[#7db4ff]">
+            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-300">
               Nuestra historia
             </span>
 
-            <h1 className="mt-4 max-w-2xl text-4xl font-bold leading-tight tracking-tight md:text-5xl lg:text-6xl">
+            <h1 className="mt-3 max-w-2xl text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-5xl">
               No vendemos autos.
-
-              <span className="block text-[#7db4ff]">
+              <span className="block text-blue-300">
                 Construimos confianza.
               </span>
             </h1>
 
-            <p className="mt-6 max-w-xl text-base leading-relaxed text-gray-300 md:text-lg">
+            <p className="mt-4 max-w-xl text-sm leading-6 text-slate-400 sm:text-base">
               Degra Automotores nació con trabajo,
               esfuerzo y una idea clara:
-              acompañar a cada persona en uno
-              de los momentos más importantes,
-              elegir su próximo vehículo.
+              acompañar a cada persona al momento
+              de elegir su próximo vehículo.
             </p>
 
-            <div className="mt-8 flex flex-wrap gap-3">
+            <div className="mt-6 flex flex-wrap gap-2">
 
               <Link
                 href="/vehiculos"
                 className="
                   inline-flex
+                  h-10
                   items-center
                   gap-2
-                  rounded-xl
+                  rounded-lg
                   bg-[#1f4e96]
-                  px-6
-                  py-3.5
+                  px-4
+                  text-sm
                   font-semibold
                   text-white
-                  transition-all
-                  duration-300
-                  hover:-translate-y-0.5
-                  hover:bg-[#163b71]
+                  transition
+                  hover:bg-[#295eaa]
                 "
               >
                 Ver vehículos
-                <ArrowRight size={18} />
+                <ArrowRight size={15} />
               </Link>
 
               <Link
                 href="/contacto"
                 className="
                   inline-flex
+                  h-10
                   items-center
                   gap-2
-                  rounded-xl
+                  rounded-lg
                   border
-                  border-white/20
-                  bg-white/5
-                  px-6
-                  py-3.5
+                  border-white/10
+                  bg-white/[0.03]
+                  px-4
+                  text-sm
                   font-semibold
-                  text-white
+                  text-slate-300
                   transition
-                  hover:bg-white
-                  hover:text-[#071224]
+                  hover:border-white/20
+                  hover:text-white
                 "
               >
-                Conocé al equipo
+                Contactarnos
               </Link>
 
             </div>
@@ -282,20 +305,18 @@ export default function SobreNosotrosPage() {
           <motion.div
             initial={{
               opacity: 0,
-              scale: 0.96,
+              scale: 0.97,
             }}
             animate={{
               opacity: 1,
               scale: 1,
             }}
             transition={{
-              duration: 0.8,
-              delay: 0.1,
+              duration: 0.7,
             }}
-            className="relative"
           >
 
-            <div className="relative h-[380px] overflow-hidden rounded-3xl shadow-2xl md:h-[520px]">
+            <div className="relative h-[290px] overflow-hidden rounded-2xl border border-white/10 sm:h-[360px] lg:h-[390px]">
 
               <Image
                 src="/images/about/equipo.jpg"
@@ -303,21 +324,23 @@ export default function SobreNosotrosPage() {
                 fill
                 priority
                 className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 50vw"
+                sizes="(max-width: 1024px) 100vw, 45vw"
               />
 
-              <div className="absolute inset-0 bg-gradient-to-t from-[#071224]/70 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#071224]/75 via-transparent to-transparent" />
 
-              <div className="absolute bottom-5 left-5 right-5">
+              <div className="absolute bottom-4 left-4">
 
-                <div className="inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-semibold text-[#071224] shadow-lg">
+                <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-[#071224]/80 px-3 py-2 backdrop-blur">
 
                   <Users
-                    size={17}
-                    className="text-[#1f4e96]"
+                    size={15}
+                    className="text-blue-300"
                   />
 
-                  Un equipo que crece con vos
+                  <span className="text-xs font-medium text-white">
+                    Un equipo que crece con vos
+                  </span>
 
                 </div>
 
@@ -331,307 +354,202 @@ export default function SobreNosotrosPage() {
 
       </section>
 
-      {/* ========================= */}
-      {/* FRASE */}
-      {/* ========================= */}
+      {/* =====================================
+          ESTADÍSTICAS
+      ===================================== */}
 
-      <section className="bg-white py-20">
+      <section className="border-b border-white/10">
 
-        <div className="mx-auto max-w-5xl px-4 text-center sm:px-6">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
 
-          <motion.div
-            initial={{
-              opacity: 0,
-              y: 20,
-            }}
-            whileInView={{
-              opacity: 1,
-              y: 0,
-            }}
-            viewport={{
-              once: true,
-              amount: 0.3,
-            }}
-            transition={{
-              duration: 0.6,
-            }}
-          >
+          <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
 
-            <span className="text-sm font-bold uppercase tracking-[0.2em] text-[#1f4e96]">
-              Nuestra esencia
-            </span>
+            {stats.map((stat) => (
+              <div
+                key={stat.label}
+                className="
+                  rounded-xl
+                  border
+                  border-white/10
+                  bg-[#0c192d]
+                  px-4
+                  py-4
+                  text-center
+                "
+              >
 
-            <h2 className="mx-auto mt-4 max-w-4xl text-3xl font-bold leading-tight text-[#071224] md:text-4xl lg:text-5xl">
-              Empezamos con poco, pero con
-              muchas ganas de hacer las cosas
-              bien.
-            </h2>
+                <p className="text-2xl font-bold text-white sm:text-3xl">
+                  {stat.value}
+                </p>
 
-            <p className="mx-auto mt-6 max-w-3xl text-base leading-relaxed text-gray-600 md:text-lg">
-              Y esa sigue siendo nuestra forma
-              de trabajar. Cada cliente, cada
-              consulta y cada vehículo forman
-              parte de nuestra historia.
-            </p>
+                <p className="mt-1 text-[11px] text-slate-500">
+                  {stat.label}
+                </p>
 
-          </motion.div>
+              </div>
+            ))}
+
+          </div>
 
         </div>
 
       </section>
 
-      {/* ========================= */}
-      {/* HISTORIA CARRUSEL */}
-      {/* ========================= */}
 
-      <section className="overflow-hidden bg-[#f3f4f6] py-20">
+      {/* =====================================
+          HISTORIA
+      ===================================== */}
+
+      <section className="overflow-hidden border-b border-white/10 py-14">
 
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
-          <div className="mb-10 text-center">
+          <div className="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
 
-            <span className="text-sm font-bold uppercase tracking-[0.2em] text-[#1f4e96]">
-              El camino
-            </span>
+            <div>
 
-            <h2 className="mt-3 text-3xl font-bold text-[#071224] md:text-4xl">
-              Nuestra historia
-            </h2>
+              <span className="text-xs font-semibold uppercase tracking-[0.18em] text-blue-300">
+                El camino
+              </span>
 
-            <p className="mx-auto mt-3 max-w-2xl text-gray-600">
-              Algunos momentos que marcaron
-              nuestro crecimiento.
-            </p>
+              <h2 className="mt-2 text-2xl font-semibold text-white sm:text-3xl">
+                Nuestra historia
+              </h2>
 
-          </div>
-
-          {/* CARRUSEL */}
-
-          <div className="relative">
-
-            <div
-              ref={emblaRef}
-              className="overflow-hidden px-2 py-8 md:px-14"
-            >
-
-              <div className="flex touch-pan-y">
-
-                {history.map(
-                  (item, index) => {
-
-                    const isSelected =
-                      index ===
-                      selectedIndex;
-
-                    return (
-                      <div
-                        key={item.year}
-                        className="
-                          min-w-0
-                          flex-[0_0_88%]
-                          px-3
-                          sm:flex-[0_0_68%]
-                          md:flex-[0_0_50%]
-                          lg:flex-[0_0_42%]
-                        "
-                      >
-
-                        <motion.article
-                          onClick={() =>
-                            selectSlide(
-                              index
-                            )
-                          }
-                          animate={{
-                            scale:
-                              isSelected
-                                ? 1.03
-                                : 0.94,
-                            opacity:
-                              isSelected
-                                ? 1
-                                : 0.65,
-                            y:
-                              isSelected
-                                ? 0
-                                : 8,
-                          }}
-                          whileHover={{
-                            scale:
-                              isSelected
-                                ? 1.04
-                                : 0.97,
-                          }}
-                          transition={{
-                            duration: 0.35,
-                          }}
-                          className={`
-                            group
-                            cursor-pointer
-                            overflow-hidden
-                            rounded-3xl
-                            border
-                            bg-white
-                            shadow-lg
-                            transition-all
-                            ${
-                              isSelected
-                                ? 'border-[#1f4e96]/40 shadow-2xl'
-                                : 'border-gray-200'
-                            }
-                          `}
-                        >
-
-                          {/* IMAGEN */}
-
-                          <div className="relative h-[250px] overflow-hidden md:h-[290px]">
-
-                            <Image
-                              src={
-                                item.image
-                              }
-                              alt={
-                                item.title
-                              }
-                              fill
-                              className="
-                                object-cover
-                                transition-transform
-                                duration-700
-                                group-hover:scale-105
-                              "
-                              sizes="
-                                (max-width: 640px) 88vw,
-                                (max-width: 768px) 68vw,
-                                (max-width: 1024px) 50vw,
-                                42vw
-                              "
-                            />
-
-                            <div className="absolute inset-0 bg-gradient-to-t from-[#071224]/80 via-transparent to-transparent" />
-
-                            <div className="absolute bottom-4 left-5">
-
-                              <span className="text-4xl font-black tracking-tight text-white md:text-5xl">
-                                {item.year}
-                              </span>
-
-                            </div>
-
-                          </div>
-
-                          {/* INFO */}
-
-                          <div className="p-6">
-
-                            <h3 className="text-xl font-bold text-[#071224] md:text-2xl">
-                              {
-                                item.title
-                              }
-                            </h3>
-
-                            <p className="mt-3 line-clamp-4 text-sm leading-relaxed text-gray-600 md:text-base">
-                              {
-                                item.description
-                              }
-                            </p>
-
-                            <div className="mt-5 flex items-center gap-2 text-sm font-semibold text-[#1f4e96]">
-
-                              <CheckCircle2
-                                size={17}
-                              />
-
-                              Parte de nuestra historia
-
-                            </div>
-
-                          </div>
-
-                        </motion.article>
-
-                      </div>
-                    );
-                  }
-                )}
-
-              </div>
+              <p className="mt-2 text-sm text-slate-500">
+                Algunos momentos que marcaron nuestro crecimiento.
+              </p>
 
             </div>
 
-            {/* FLECHA IZQUIERDA */}
+            <div className="hidden gap-2 md:flex">
 
-            <button
-              type="button"
-              onClick={scrollPrev}
-              aria-label="Historia anterior"
-              className="
-                absolute
-                left-0
-                top-1/2
-                z-10
-                hidden
-                h-11
-                w-11
-                -translate-y-1/2
-                items-center
-                justify-center
-                rounded-full
-                bg-white
-                text-[#071224]
-                shadow-xl
-                transition-all
-                hover:scale-110
-                hover:text-[#1f4e96]
-                md:flex
-              "
-            >
-              <ChevronLeft
-                size={24}
-              />
-            </button>
+              <button
+                type="button"
+                onClick={scrollPrev}
+                className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-[#0c192d] text-slate-400 transition hover:border-[#3169b7] hover:text-white"
+              >
+                <ChevronLeft size={17} />
+              </button>
 
-            {/* FLECHA DERECHA */}
+              <button
+                type="button"
+                onClick={scrollNext}
+                className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-[#0c192d] text-slate-400 transition hover:border-[#3169b7] hover:text-white"
+              >
+                <ChevronRight size={17} />
+              </button>
 
-            <button
-              type="button"
-              onClick={scrollNext}
-              aria-label="Historia siguiente"
-              className="
-                absolute
-                right-0
-                top-1/2
-                z-10
-                hidden
-                h-11
-                w-11
-                -translate-y-1/2
-                items-center
-                justify-center
-                rounded-full
-                bg-white
-                text-[#071224]
-                shadow-xl
-                transition-all
-                hover:scale-110
-                hover:text-[#1f4e96]
-                md:flex
-              "
-            >
-              <ChevronRight
-                size={24}
-              />
-            </button>
+            </div>
 
           </div>
 
-          {/* BOTONES AÑOS */}
+          <div
+            ref={emblaRef}
+            className="overflow-hidden"
+          >
 
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+            <div className="flex touch-pan-y">
+
+              {history.map(
+                (item, index) => {
+
+                  const isSelected =
+                    index ===
+                    selectedIndex;
+
+                  return (
+                    <div
+                      key={item.year}
+                      className="
+                        min-w-0
+                        flex-[0_0_88%]
+                        pr-3
+                        sm:flex-[0_0_60%]
+                        md:flex-[0_0_45%]
+                        lg:flex-[0_0_34%]
+                      "
+                    >
+
+                      <motion.article
+                        onClick={() =>
+                          selectSlide(index)
+                        }
+                        animate={{
+                          opacity:
+                            isSelected
+                              ? 1
+                              : 0.55,
+                        }}
+                        transition={{
+                          duration: 0.25,
+                        }}
+                        className="
+                          group
+                          h-full
+                          cursor-pointer
+                          overflow-hidden
+                          rounded-xl
+                          border
+                          border-white/10
+                          bg-[#0c192d]
+                          transition
+                          hover:border-[#3169b7]/70
+                        "
+                      >
+
+                        <div className="relative h-[185px] overflow-hidden">
+
+                          <Image
+                            src={item.image}
+                            alt={item.title}
+                            fill
+                            className="object-cover transition-transform duration-700 group-hover:scale-105"
+                            sizes="
+                              (max-width: 640px) 88vw,
+                              (max-width: 768px) 60vw,
+                              (max-width: 1024px) 45vw,
+                              34vw
+                            "
+                          />
+
+                          <div className="absolute inset-0 bg-gradient-to-t from-[#071224]/85 via-transparent to-transparent" />
+
+                          <span className="absolute bottom-3 left-4 text-2xl font-bold text-white">
+                            {item.year}
+                          </span>
+
+                        </div>
+
+                        <div className="p-4">
+
+                          <h3 className="text-base font-semibold text-white">
+                            {item.title}
+                          </h3>
+
+                          <p className="mt-2 line-clamp-4 text-xs leading-5 text-slate-400">
+                            {item.description}
+                          </p>
+
+                        </div>
+
+                      </motion.article>
+
+                    </div>
+                  );
+                },
+              )}
+
+            </div>
+
+          </div>
+
+          {/* AÑOS */}
+
+          <div className="mt-5 flex flex-wrap gap-2">
 
             {history.map(
               (item, index) => (
-
                 <button
                   key={item.year}
                   type="button"
@@ -639,24 +557,23 @@ export default function SobreNosotrosPage() {
                     selectSlide(index)
                   }
                   className={`
-                    rounded-full
-                    px-4
-                    py-2
-                    text-sm
+                    h-8
+                    rounded-lg
+                    px-3
+                    text-xs
                     font-semibold
-                    transition-all
+                    transition
                     ${
                       selectedIndex ===
                       index
-                        ? 'bg-[#1f4e96] text-white shadow-md'
-                        : 'bg-white text-gray-500 hover:text-[#1f4e96]'
+                        ? 'bg-[#1f4e96] text-white'
+                        : 'border border-white/10 bg-[#0c192d] text-slate-500 hover:text-white'
                     }
                   `}
                 >
                   {item.year}
                 </button>
-
-              )
+              ),
             )}
 
           </div>
@@ -665,91 +582,31 @@ export default function SobreNosotrosPage() {
 
       </section>
 
-      {/* ========================= */}
-      {/* ESTADÍSTICAS */}
-      {/* ========================= */}
+      {/* =====================================
+          VALORES
+      ===================================== */}
 
-      <section className="bg-[#071224] py-16 text-white">
-
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-
-            {stats.map(
-              (stat) => (
-
-                <motion.div
-                  key={stat.label}
-                  initial={{
-                    opacity: 0,
-                    y: 20,
-                  }}
-                  whileInView={{
-                    opacity: 1,
-                    y: 0,
-                  }}
-                  viewport={{
-                    once: true,
-                  }}
-                  whileHover={{
-                    y: -4,
-                  }}
-                  className="
-                    rounded-2xl
-                    border
-                    border-white/10
-                    bg-white/5
-                    p-6
-                    text-center
-                    backdrop-blur
-                  "
-                >
-
-                  <p className="text-4xl font-black text-white">
-                    {stat.value}
-                  </p>
-
-                  <p className="mt-2 text-sm text-gray-300">
-                    {stat.label}
-                  </p>
-
-                </motion.div>
-
-              )
-            )}
-
-          </div>
-
-        </div>
-
-      </section>
-
-      {/* ========================= */}
-      {/* VALORES */}
-      {/* ========================= */}
-
-      <section className="bg-white py-20">
+      <section className="border-b border-white/10 py-14">
 
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
-          <div className="mb-12 text-center">
+          <div className="mb-7">
 
-            <span className="text-sm font-bold uppercase tracking-[0.2em] text-[#1f4e96]">
+            <span className="text-xs font-semibold uppercase tracking-[0.18em] text-blue-300">
               Lo que nos mueve
             </span>
 
-            <h2 className="mt-3 text-3xl font-bold text-[#071224] md:text-4xl">
-              Más que vender vehículos
+            <h2 className="mt-2 text-2xl font-semibold text-white sm:text-3xl">
+              Nuestra forma de trabajar
             </h2>
 
-            <p className="mx-auto mt-3 max-w-2xl text-gray-600">
-              Nuestra forma de trabajar se basa
-              en cuatro cosas que no negociamos.
+            <p className="mt-2 max-w-xl text-sm text-slate-500">
+              Cuatro principios que están presentes en cada operación.
             </p>
 
           </div>
 
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
 
             {values.map(
               ({
@@ -762,7 +619,7 @@ export default function SobreNosotrosPage() {
                   key={title}
                   initial={{
                     opacity: 0,
-                    y: 20,
+                    y: 15,
                   }}
                   whileInView={{
                     opacity: 1,
@@ -771,38 +628,30 @@ export default function SobreNosotrosPage() {
                   viewport={{
                     once: true,
                   }}
-                  whileHover={{
-                    y: -5,
-                  }}
                   className="
-                    rounded-3xl
+                    rounded-xl
                     border
-                    border-gray-200
-                    bg-white
-                    p-6
-                    shadow-sm
-                    transition-shadow
-                    hover:shadow-xl
+                    border-white/10
+                    bg-[#0c192d]
+                    p-4
                   "
                 >
 
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#1f4e96]/10 text-[#1f4e96]">
-
-                    <Icon size={23} />
-
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#1f4e96]/15 text-blue-300">
+                    <Icon size={17} />
                   </div>
 
-                  <h3 className="mt-5 text-xl font-bold text-[#071224]">
+                  <h3 className="mt-4 text-sm font-semibold text-white">
                     {title}
                   </h3>
 
-                  <p className="mt-3 text-sm leading-relaxed text-gray-600">
+                  <p className="mt-2 text-xs leading-5 text-slate-500">
                     {description}
                   </p>
 
                 </motion.div>
 
-              )
+              ),
             )}
 
           </div>
@@ -811,112 +660,109 @@ export default function SobreNosotrosPage() {
 
       </section>
 
-      {/* ========================= */}
-      {/* IDENTIDAD */}
-      {/* ========================= */}
+      {/* =====================================
+          IDENTIDAD
+      ===================================== */}
 
-      <section className="bg-[#f3f4f6] py-20">
+      <section className="border-b border-white/10 py-14">
 
-        <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
+        <div className="
+          mx-auto
+          grid
+          max-w-7xl
+          items-center
+          gap-8
+          px-4
+          sm:px-6
+          lg:grid-cols-2
+          lg:px-8
+        ">
+
+          {/* IMAGEN */}
+
+          <div className="relative h-[300px] overflow-hidden rounded-2xl border border-white/10 sm:h-[360px]">
+
+            <Image
+              src="/images/about/agencia.jpg"
+              alt="Degra Automotores"
+              fill
+              className="object-cover"
+              sizes="(max-width: 1024px) 100vw, 50vw"
+            />
+
+            <div className="absolute inset-0 bg-gradient-to-t from-[#071224]/60 via-transparent to-transparent" />
+
+            <div className="absolute bottom-4 left-4">
+
+              <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-[#071224]/80 px-3 py-2 backdrop-blur">
+
+                <MapPin
+                  size={15}
+                  className="text-blue-300"
+                />
+
+                <span className="text-xs font-medium">
+                  Degra Automotores
+                </span>
+
+              </div>
+
+            </div>
+
+          </div>
 
           {/* TEXTO */}
 
           <div>
 
-            <span className="text-sm font-bold uppercase tracking-[0.2em] text-[#1f4e96]">
-              Somos DR
+            <span className="text-xs font-semibold uppercase tracking-[0.18em] text-blue-300">
+              Somos Degra
             </span>
 
-            <h2 className="mt-3 text-3xl font-bold leading-tight text-[#071224] md:text-4xl">
+            <h2 className="mt-3 text-2xl font-semibold leading-tight sm:text-3xl">
               La agencia creció.
               <br />
               La esencia sigue siendo la misma.
             </h2>
 
-            <p className="mt-5 leading-relaxed text-gray-600">
-              Queremos que cuando una persona
-              piense en cambiar su auto,
-              venderlo o buscar una oportunidad,
-              piense en nosotros.
+            <p className="mt-4 max-w-xl text-sm leading-6 text-slate-400">
+              Queremos que cuando una persona piense en
+              cambiar su auto, venderlo o buscar una
+              oportunidad, piense en nosotros.
             </p>
 
-            <p className="mt-4 leading-relaxed text-gray-600">
-              No por ser los más grandes, sino
-              porque sabe que va a encontrar un
-              equipo que la escuche, la asesore
-              y la acompañe.
+            <p className="mt-3 max-w-xl text-sm leading-6 text-slate-400">
+              No por ser los más grandes, sino porque
+              sabe que va a encontrar un equipo que la
+              escuche, la asesore y la acompañe.
             </p>
 
-            <div className="mt-7 space-y-3">
+            <div className="mt-5 grid gap-2 sm:grid-cols-2">
 
               {[
                 'Atención personalizada',
                 'Vehículos seleccionados',
                 'Opciones de financiación',
                 'Consignación de vehículos',
-              ].map(
-                (item) => (
+              ].map((item) => (
 
-                  <div
-                    key={item}
-                    className="flex items-center gap-3"
-                  >
+                <div
+                  key={item}
+                  className="flex items-center gap-2"
+                >
 
-                    <CheckCircle2
-                      size={19}
-                      className="text-[#1f4e96]"
-                    />
+                  <CheckCircle2
+                    size={15}
+                    className="text-blue-300"
+                  />
 
-                    <span className="font-medium text-[#071224]">
-                      {item}
-                    </span>
-
-                  </div>
-
-                )
-              )}
-
-            </div>
-
-          </div>
-
-          {/* IMAGEN */}
-
-          <div className="relative">
-
-            <div className="relative h-[420px] overflow-hidden rounded-3xl shadow-xl md:h-[500px]">
-
-              <Image
-                src="/images/about/agencia.jpg"
-                alt="Degra Automotores"
-                fill
-                className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 50vw"
-              />
-
-              <div className="absolute inset-0 bg-gradient-to-t from-[#071224]/50 via-transparent to-transparent" />
-
-              <div className="absolute bottom-5 left-5 flex items-center gap-3 rounded-2xl bg-white/90 px-4 py-3 shadow-lg backdrop-blur">
-
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#1f4e96] text-white">
-
-                  <MapPin size={20} />
+                  <span className="text-xs font-medium text-slate-300">
+                    {item}
+                  </span>
 
                 </div>
 
-                <div>
-
-                  <p className="text-xs text-gray-500">
-                    Nuestra casa
-                  </p>
-
-                  <p className="font-bold text-[#071224]">
-                    Degra Automotores
-                  </p>
-
-                </div>
-
-              </div>
+              ))}
 
             </div>
 
@@ -926,72 +772,70 @@ export default function SobreNosotrosPage() {
 
       </section>
 
-      {/* ========================= */}
-      {/* CTA FINAL */}
-      {/* ========================= */}
+      {/* =====================================
+          CTA
+      ===================================== */}
 
-      <section className="relative overflow-hidden bg-[#071224] py-20 text-white">
+      <section className="relative overflow-hidden py-14">
 
-        <div className="pointer-events-none absolute left-1/2 top-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#1f4e96]/20 blur-3xl" />
+        <div className="pointer-events-none absolute left-1/2 top-1/2 h-[400px] w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#1f4e96]/15 blur-[120px]" />
 
-        <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6">
+        <div className="relative mx-auto max-w-3xl px-4 text-center sm:px-6">
 
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#1f4e96]">
-
-            <CarFront size={28} />
-
+          <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-xl bg-[#1f4e96]">
+            <CarFront size={21} />
           </div>
 
-          <h2 className="mt-6 text-3xl font-bold md:text-4xl lg:text-5xl">
+          <h2 className="mt-5 text-2xl font-semibold sm:text-3xl">
             Nuestra historia sigue.
           </h2>
 
-          <p className="mx-auto mt-4 max-w-2xl text-gray-300 md:text-lg">
-            Y queremos que tu próximo vehículo
-            también forme parte de ella.
+          <p className="mx-auto mt-3 max-w-xl text-sm text-slate-400">
+            Y queremos que tu próximo vehículo también forme parte de ella.
           </p>
 
-          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+          <div className="mt-6 flex flex-col justify-center gap-2 sm:flex-row">
 
             <Link
               href="/vehiculos"
               className="
                 inline-flex
+                h-10
                 items-center
                 justify-center
                 gap-2
-                rounded-xl
+                rounded-lg
                 bg-[#1f4e96]
-                px-7
-                py-3.5
+                px-5
+                text-sm
                 font-semibold
                 text-white
                 transition
-                hover:bg-[#163b71]
+                hover:bg-[#295eaa]
               "
             >
               Ver vehículos
-
-              <ArrowRight size={18} />
+              <ArrowRight size={15} />
             </Link>
 
             <Link
               href="/contacto"
               className="
                 inline-flex
+                h-10
                 items-center
                 justify-center
-                rounded-xl
+                rounded-lg
                 border
-                border-white/20
-                bg-white/5
-                px-7
-                py-3.5
+                border-white/10
+                bg-white/[0.03]
+                px-5
+                text-sm
                 font-semibold
-                text-white
+                text-slate-300
                 transition
-                hover:bg-white
-                hover:text-[#071224]
+                hover:border-white/20
+                hover:text-white
               "
             >
               Contactarnos

@@ -128,7 +128,7 @@ export default function VehicleDetailPage() {
         <div className="grid gap-10 lg:grid-cols-[1.3fr_1fr]">
           {/* GALERÍA */}
           <div>
-            <div className="relative h-[360px] w-full overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm md:h-[460px]">
+            <div className="relative aspect-[4/5] w-full max-h-[560px] overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm">
               <Image
                 src={images[activeImage]}
                 alt={`${vehicle.brand} ${vehicle.model}`}

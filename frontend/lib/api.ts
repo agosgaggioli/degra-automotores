@@ -76,6 +76,23 @@ export interface ContactMessage {
   updated_at: string;
 }
 
+export interface Financing {
+  id: string;
+  type: 'general' | 'brand';
+  bank: string;
+  logo: string | null;
+  name: string;
+  cuotas: number;
+  tasa: string | null;
+  anticipo: string | null;
+  beneficio: string | null;
+  url: string;
+  brand: string | null;
+  status: 'published' | 'draft';
+  created_at: string;
+  updated_at: string;
+}
+
 class ApiError extends Error {
   status: number;
   constructor(message: string, status: number) {
@@ -158,6 +175,11 @@ export async function submitContact(payload: {
     body: JSON.stringify(payload),
   });
   return handleResponse<{ message: string }>(res);
+}
+
+export async function fetchFinancings(): Promise<{ data: Financing[] }> {
+  const res = await fetch(`${API_URL}/financings`, { cache: 'no-store' });
+  return handleResponse<{ data: Financing[] }>(res);
 }
 
 /* =========================================================
@@ -296,6 +318,47 @@ export async function updateContactMessage(id: string, payload: { status: string
 
 export async function deleteContactMessage(id: string) {
   const res = await fetch(`${API_URL}/admin/contact/${id}`, {
+    method: 'DELETE',
+    headers: { ...authHeaders() },
+  });
+  return handleResponse<{ ok: true }>(res);
+}
+export async function fetchAdminFinancings(params: { status?: string; search?: string } = {}): Promise<{
+  data: Financing[];
+}> {
+  const qs = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== '') qs.set(key, String(value));
+  });
+  const res = await fetch(`${API_URL}/admin/financings?${qs.toString()}`, { headers: { ...authHeaders() } });
+  return handleResponse<{ data: Financing[] }>(res);
+}
+
+export async function fetchAdminFinancing(id: string) {
+  const res = await fetch(`${API_URL}/admin/financings/${id}`, { headers: { ...authHeaders() } });
+  return handleResponse<{ data: Financing }>(res);
+}
+
+export async function createFinancing(formData: FormData) {
+  const res = await fetch(`${API_URL}/admin/financings`, {
+    method: 'POST',
+    headers: { ...authHeaders() },
+    body: formData,
+  });
+  return handleResponse<{ data: Financing }>(res);
+}
+
+export async function updateFinancing(id: string, formData: FormData) {
+  const res = await fetch(`${API_URL}/admin/financings/${id}`, {
+    method: 'PUT',
+    headers: { ...authHeaders() },
+    body: formData,
+  });
+  return handleResponse<{ data: Financing }>(res);
+}
+
+export async function deleteFinancing(id: string) {
+  const res = await fetch(`${API_URL}/admin/financings/${id}`, {
     method: 'DELETE',
     headers: { ...authHeaders() },
   });

@@ -6,6 +6,7 @@ const vehiclesController = require('../controllers/vehiclesController');
 const consignmentsController = require('../controllers/consignmentsController');
 const contactController = require('../controllers/contactController');
 const statsController = require('../controllers/statsController');
+const financingsController = require('../controllers/financingsController');
 
 const router = express.Router();
 
@@ -33,5 +34,13 @@ router.delete('/consignments/:id', consignmentsController.remove);
 router.get('/contact', contactController.list);
 router.patch('/contact/:id', contactController.update);
 router.delete('/contact/:id', contactController.remove);
+
+//finanaciaciones
+// Financiaciones
+router.get('/financings', financingsController.listAdmin);
+router.get('/financings/:id', financingsController.getOneAdmin);
+router.post('/financings', upload.single('logo'), financingsController.create);
+router.put('/financings/:id', upload.single('logo'), financingsController.update);
+router.delete('/financings/:id', financingsController.remove);
 
 module.exports = router;

@@ -7,14 +7,18 @@ import React, {
 } from 'react';
 
 import useEmblaCarousel from 'embla-carousel-react';
-import { motion } from 'framer-motion';
 import Image from 'next/image';
 
 import {
   ChevronLeft,
   ChevronRight,
   MessageCircle,
+  Users,
 } from 'lucide-react';
+
+/* =========================================
+   TYPES
+========================================= */
 
 interface Seller {
   id: string;
@@ -23,6 +27,10 @@ interface Seller {
   photo: string;
   whatsapp: string;
 }
+
+/* =========================================
+   VENDEDORES
+========================================= */
 
 const sellers: Seller[] = [
   {
@@ -48,6 +56,10 @@ const sellers: Seller[] = [
   },
 ];
 
+/* =========================================
+   COMPONENT
+========================================= */
+
 export default function SellersCarousel() {
   const [selectedIndex, setSelectedIndex] =
     useState(0);
@@ -55,65 +67,41 @@ export default function SellersCarousel() {
   const [emblaRef, emblaApi] =
     useEmblaCarousel({
       loop: true,
-      align: 'center',
+      align: 'start',
       slidesToScroll: 1,
       skipSnaps: false,
       dragFree: false,
     });
 
-  /* ========================= */
-  /* ACTUALIZAR CARD ACTIVA */
-  /* ========================= */
+  /* =========================================
+     SELECCIÓN
+  ========================================= */
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
 
     setSelectedIndex(
-      emblaApi.selectedScrollSnap()
+      emblaApi.selectedScrollSnap(),
     );
   }, [emblaApi]);
-
-  /* ========================= */
-  /* INICIALIZAR EMBLA */
-  /* ========================= */
 
   useEffect(() => {
     if (!emblaApi) return;
 
     onSelect();
 
-    emblaApi.on(
-      'select',
-      onSelect
-    );
-
-    emblaApi.on(
-      'reInit',
-      onSelect
-    );
-
-    /*
-      Fuerza a Embla a recalcular
-      tamaños cuando se monta.
-    */
-    emblaApi.reInit();
+    emblaApi.on('select', onSelect);
+    emblaApi.on('reInit', onSelect);
 
     return () => {
-      emblaApi.off(
-        'select',
-        onSelect
-      );
-
-      emblaApi.off(
-        'reInit',
-        onSelect
-      );
+      emblaApi.off('select', onSelect);
+      emblaApi.off('reInit', onSelect);
     };
   }, [emblaApi, onSelect]);
 
-  /* ========================= */
-  /* AUTOPLAY */
-  /* ========================= */
+  /* =========================================
+     AUTOPLAY
+  ========================================= */
 
   useEffect(() => {
     if (!emblaApi) return;
@@ -127,390 +115,428 @@ export default function SellersCarousel() {
     };
   }, [emblaApi]);
 
-  /* ========================= */
-  /* NAVEGACIÓN */
-  /* ========================= */
+  /* =========================================
+     NAVEGACIÓN
+  ========================================= */
 
-  const scrollPrev =
-    useCallback(() => {
-      if (!emblaApi) return;
+  const scrollPrev = useCallback(() => {
+    emblaApi?.scrollPrev();
+  }, [emblaApi]);
 
-      emblaApi.scrollPrev();
-    }, [emblaApi]);
+  const scrollNext = useCallback(() => {
+    emblaApi?.scrollNext();
+  }, [emblaApi]);
 
-  const scrollNext =
-    useCallback(() => {
-      if (!emblaApi) return;
+  const selectSlide = useCallback(
+    (index: number) => {
+      emblaApi?.scrollTo(index);
+    },
+    [emblaApi],
+  );
 
-      emblaApi.scrollNext();
-    }, [emblaApi]);
-
-  const selectSlide =
-    useCallback(
-      (index: number) => {
-        if (!emblaApi) return;
-
-        emblaApi.scrollTo(index);
-      },
-      [emblaApi]
-    );
+  /* =========================================
+     RENDER
+  ========================================= */
 
   return (
-    <section className="relative overflow-hidden bg-white py-16">
+    <section className="relative overflow-hidden bg-[#071224] py-12">
 
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+      {/* LUCES DE FONDO */}
 
-        {/* ========================= */}
-        {/* ENCABEZADO */}
-        {/* ========================= */}
+      <div className="pointer-events-none absolute -left-48 top-0 h-[380px] w-[380px] rounded-full bg-[#1f4e96]/10 blur-[120px]" />
 
-        <div className="mx-auto mb-7 max-w-2xl text-center">
+      <div className="pointer-events-none absolute -right-48 bottom-0 h-[380px] w-[380px] rounded-full bg-[#163b71]/10 blur-[120px]" />
 
-          <span className="mb-2 inline-block text-xs font-semibold uppercase tracking-[0.18em] text-[#1f4e96]">
-            Estamos para ayudarte
-          </span>
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
-          <h2 className="text-3xl font-bold tracking-tight text-[#071224] md:text-4xl">
-            Encontrá tu próximo auto
-            con nosotros
-          </h2>
+        {/* =====================================
+            ENCABEZADO
+        ===================================== */}
 
-          <p className="mt-3 text-gray-600">
-            Nuestro equipo está listo
-            para asesorarte.
-          </p>
+        <div className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+
+          <div>
+
+            <div className="flex items-center gap-2">
+
+              <Users
+                size={14}
+                className="text-blue-300"
+              />
+
+              <span className="text-xs font-semibold uppercase tracking-[0.18em] text-blue-300">
+                Nuestro equipo
+              </span>
+
+            </div>
+
+            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+              Estamos para ayudarte
+            </h2>
+
+            <p className="mt-2 max-w-xl text-sm leading-6 text-slate-400">
+              Contactá directamente a uno de nuestros
+              asesores y encontrá tu próximo vehículo.
+            </p>
+
+          </div>
+
+          {/* FLECHAS DESKTOP */}
+
+          <div className="hidden items-center gap-2 sm:flex">
+
+            <button
+              type="button"
+              onClick={scrollPrev}
+              aria-label="Vendedor anterior"
+              className="
+                flex
+                h-9
+                w-9
+                items-center
+                justify-center
+                rounded-lg
+                border
+                border-white/10
+                bg-[#0c192d]
+                text-slate-400
+                transition
+                hover:border-[#3169b7]
+                hover:text-white
+              "
+            >
+              <ChevronLeft size={17} />
+            </button>
+
+            <button
+              type="button"
+              onClick={scrollNext}
+              aria-label="Vendedor siguiente"
+              className="
+                flex
+                h-9
+                w-9
+                items-center
+                justify-center
+                rounded-lg
+                border
+                border-white/10
+                bg-[#0c192d]
+                text-slate-400
+                transition
+                hover:border-[#3169b7]
+                hover:text-white
+              "
+            >
+              <ChevronRight size={17} />
+            </button>
+
+          </div>
 
         </div>
 
-        {/* ========================= */}
-        {/* CARRUSEL */}
-        {/* ========================= */}
+        {/* =====================================
+            CARRUSEL
+        ===================================== */}
 
-        <div className="relative">
+        <div
+          ref={emblaRef}
+          className="overflow-hidden"
+        >
 
-          {/* VIEWPORT */}
+          <div className="-ml-3 flex touch-pan-y">
 
-          <div
-            ref={emblaRef}
-            className="
-              overflow-hidden
-              px-2
-              py-8
-              md:px-14
-            "
-          >
+            {sellers.map(
+              (seller, index) => {
 
-            {/* CONTAINER */}
+                const isSelected =
+                  selectedIndex === index;
 
-            <div className="flex touch-pan-y">
+                const message =
+                  encodeURIComponent(
+                    `Hola ${seller.name}, estoy buscando un vehículo y quería hacerte una consulta.`,
+                  );
 
-              {sellers.map(
-                (seller, index) => {
+                const whatsappUrl =
+                  `https://wa.me/${seller.whatsapp}?text=${message}`;
 
-                  const isSelected =
-                    selectedIndex === index;
+                return (
+                  <div
+                    key={seller.id}
+                    className="
+                      min-w-0
+                      flex-[0_0_78%]
+                      pl-3
+                      sm:flex-[0_0_45%]
+                      md:flex-[0_0_33.333%]
+                      lg:flex-[0_0_25%]
+                    "
+                  >
 
-                  const message =
-                    encodeURIComponent(
-                      `Hola ${seller.name}, estoy buscando un vehículo y quería hacerte una consulta.`
-                    );
+                    {/* =============================
+                        CARD
+                    ============================= */}
 
-                  const whatsappUrl =
-                    `https://wa.me/${seller.whatsapp}?text=${message}`;
+                    <article
+                      onClick={() =>
+                        selectSlide(index)
+                      }
+                      className={`
+                        group
+                        relative
+                        flex
+                        h-full
+                        cursor-pointer
+                        flex-col
+                        items-center
+                        rounded-xl
+                        border
+                        bg-[#0c192d]
+                        px-4
+                        py-5
+                        text-center
+                        transition-all
+                        duration-300
+                        hover:-translate-y-0.5
+                        hover:border-[#3169b7]/70
 
-                  return (
-
-                    /* ========================= */
-                    /* SLIDE */
-                    /* ========================= */
-
-                    <div
-                      key={seller.id}
-                      className="
-                        min-w-0
-                        flex-[0_0_84%]
-                        px-3
-                        sm:flex-[0_0_62%]
-                        md:flex-[0_0_46%]
-                        lg:flex-[0_0_38%]
-                      "
+                        ${
+                          isSelected
+                            ? `
+                              border-[#3169b7]/60
+                              shadow-[0_16px_35px_-25px_rgba(49,105,183,0.65)]
+                            `
+                            : `
+                              border-white/10
+                            `
+                        }
+                      `}
                     >
 
-                      <motion.article
-                        onClick={() =>
-                          selectSlide(index)
-                        }
-                        animate={{
-                          scale:
-                            isSelected
-                              ? 1.04
-                              : 0.94,
+                      {/* INDICADOR ACTIVO */}
 
-                          opacity:
-                            isSelected
-                              ? 1
-                              : 0.65,
+                      {isSelected && (
+                        <span
+                          className="
+                            absolute
+                            right-3
+                            top-3
+                            h-1.5
+                            w-1.5
+                            rounded-full
+                            bg-blue-400
+                          "
+                        />
+                      )}
 
-                          y:
-                            isSelected
-                              ? 0
-                              : 6,
-                        }}
-                        whileHover={{
-                          scale:
-                            isSelected
-                              ? 1.05
-                              : 0.97,
+                      {/* =============================
+                          FOTO REDONDA
+                      ============================= */}
 
-                          y: -3,
-                        }}
-                        transition={{
-                          duration: 0.3,
-                          ease: 'easeOut',
-                        }}
+                      <div
                         className={`
-                          flex
-                          h-full
-                          cursor-pointer
-                          flex-col
-                          items-center
-                          rounded-3xl
-                          border
-                          bg-white
-                          p-5
-                          text-center
-                          transition-shadow
-                          duration-300
-                          
+                          relative
+                          h-[92px]
+                          w-[92px]
+                          shrink-0
+                          overflow-hidden
+                          rounded-full
+                          border-2
+                          bg-[#071224]
+
                           ${
                             isSelected
-                              ? 'border-[#1f4e96]/40 shadow-xl'
-                              : 'border-gray-200 shadow-sm'
+                              ? 'border-[#3169b7]'
+                              : 'border-white/10'
                           }
                         `}
                       >
 
-                        {/* ========================= */}
-                        {/* FOTO */}
-                        {/* ========================= */}
+                        <Image
+                          src={seller.photo}
+                          alt={seller.name}
+                          fill
+                          className="
+                            object-cover
+                            object-center
+                            transition-transform
+                            duration-500
+                            group-hover:scale-105
+                          "
+                          sizes="92px"
+                          priority={index === 0}
+                        />
 
-                        <div
-                          className={`
-                            relative
-                            mb-4
-                            h-28
-                            w-28
-                            overflow-hidden
-                            rounded-full
-                            border-4
-                            
-                            ${
-                              isSelected
-                                ? 'border-[#1f4e96]/20'
-                                : 'border-gray-100'
-                            }
-                          `}
-                        >
+                      </div>
 
-                          <Image
-                            src={
-                              seller.photo
-                            }
-                            alt={
-                              seller.name
-                            }
-                            fill
-                            className="object-cover object-center"
-                            sizes="112px"
-                          />
+                      {/* =============================
+                          INFORMACIÓN
+                      ============================= */}
 
-                        </div>
+                      <div className="mt-4">
 
-                        {/* ========================= */}
-                        {/* NOMBRE */}
-                        {/* ========================= */}
-
-                        <h3 className="text-lg font-bold text-[#071224]">
+                        <h3 className="text-[15px] font-semibold leading-tight text-white">
                           {seller.name}
                         </h3>
 
-                        <p className="mt-1 text-sm font-medium text-[#1f4e96]">
+                        <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-blue-300">
                           {seller.role}
                         </p>
 
-                        <p className="mt-3 max-w-[260px] text-sm leading-relaxed text-gray-500">
-                          Contactalo y recibí
-                          asesoramiento
-                          personalizado.
-                        </p>
+                      </div>
 
-                        {/* ========================= */}
-                        {/* WHATSAPP */}
-                        {/* ========================= */}
+                      {/* DESCRIPCIÓN */}
 
-                        <a
-                          href={
-                            whatsappUrl
-                          }
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={(e) =>
-                            e.stopPropagation()
-                          }
-                          aria-label={`Contactar a ${seller.name} por WhatsApp`}
-                          className="
-                            mt-5
-                            flex
-                            w-full
-                            items-center
-                            justify-center
-                            gap-2
-                            rounded-xl
-                            bg-[#071224]
-                            px-4
-                            py-2.5
-                            text-sm
-                            font-semibold
-                            text-white
-                            transition-all
-                            duration-300
-                            hover:bg-[#1f4e96]
-                            hover:shadow-md
-                          "
-                        >
+                      <p className="mt-3 max-w-[210px] text-[11px] leading-5 text-slate-500">
+                        Asesoramiento personalizado para ayudarte
+                        a encontrar la unidad indicada.
+                      </p>
 
-                          <MessageCircle
-                            size={18}
-                          />
+                      {/* SEPARADOR INTERNO */}
 
-                          Contactar
+                      <div className="my-4 h-px w-full bg-white/10" />
 
-                        </a>
+                      {/* =============================
+                          WHATSAPP
+                      ============================= */}
 
-                      </motion.article>
+                      <a
+                        href={whatsappUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) =>
+                          e.stopPropagation()
+                        }
+                        aria-label={`Contactar a ${seller.name} por WhatsApp`}
+                        className="
+                          flex
+                          h-9
+                          w-full
+                          items-center
+                          justify-center
+                          gap-2
+                          rounded-lg
+                          border
+                          border-white/10
+                          bg-white/[0.025]
+                          px-3
+                          text-[11px]
+                          font-semibold
+                          text-slate-300
+                          transition
+                          hover:border-[#3169b7]
+                          hover:bg-[#1f4e96]
+                          hover:text-white
+                        "
+                      >
+                        <MessageCircle size={14} />
 
-                    </div>
-                  );
-                }
-              )}
+                        Contactar
+                      </a>
 
-            </div>
+                    </article>
+
+                  </div>
+                );
+              },
+            )}
 
           </div>
 
-          {/* ========================= */}
-          {/* FLECHA IZQUIERDA */}
-          {/* ========================= */}
-
-          <button
-            type="button"
-            onClick={scrollPrev}
-            aria-label="Vendedor anterior"
-            className="
-              absolute
-              left-0
-              top-1/2
-              z-30
-              hidden
-              h-11
-              w-11
-              -translate-y-1/2
-              items-center
-              justify-center
-              rounded-full
-              border
-              border-gray-100
-              bg-white
-              text-[#071224]
-              shadow-xl
-              transition-all
-              duration-300
-              hover:scale-110
-              hover:text-[#1f4e96]
-              md:flex
-            "
-          >
-
-            <ChevronLeft
-              size={24}
-            />
-
-          </button>
-
-          {/* ========================= */}
-          {/* FLECHA DERECHA */}
-          {/* ========================= */}
-
-          <button
-            type="button"
-            onClick={scrollNext}
-            aria-label="Vendedor siguiente"
-            className="
-              absolute
-              right-0
-              top-1/2
-              z-30
-              hidden
-              h-11
-              w-11
-              -translate-y-1/2
-              items-center
-              justify-center
-              rounded-full
-              border
-              border-gray-100
-              bg-white
-              text-[#071224]
-              shadow-xl
-              transition-all
-              duration-300
-              hover:scale-110
-              hover:text-[#1f4e96]
-              md:flex
-            "
-          >
-
-            <ChevronRight
-              size={24}
-            />
-
-          </button>
-
         </div>
 
-        {/* ========================= */}
-        {/* INDICADORES */}
-        {/* ========================= */}
+        {/* =====================================
+            PARTE INFERIOR
+        ===================================== */}
 
-        <div className="mt-1 flex items-center justify-center gap-2">
+        <div className="mt-5 flex items-center justify-between">
 
-          {sellers.map(
-            (seller, index) => (
+          {/* INDICADORES */}
 
-              <button
-                key={seller.id}
-                type="button"
-                onClick={() =>
-                  selectSlide(index)
-                }
-                aria-label={`Ir al vendedor ${index + 1}`}
-                className={`
-                  h-2
-                  rounded-full
-                  transition-all
-                  duration-300
-                  
-                  ${
-                    selectedIndex ===
-                    index
-                      ? 'w-7 bg-[#1f4e96]'
-                      : 'w-2 bg-gray-300 hover:bg-gray-400'
+          <div className="flex items-center gap-1.5">
+
+            {sellers.map(
+              (seller, index) => (
+                <button
+                  key={seller.id}
+                  type="button"
+                  onClick={() =>
+                    selectSlide(index)
                   }
-                `}
-              />
+                  aria-label={`Ir al vendedor ${index + 1}`}
+                  className={`
+                    h-1.5
+                    rounded-full
+                    transition-all
+                    duration-300
 
-            )
-          )}
+                    ${
+                      selectedIndex === index
+                        ? 'w-6 bg-[#1f4e96]'
+                        : 'w-1.5 bg-white/20 hover:bg-white/40'
+                    }
+                  `}
+                />
+              ),
+            )}
+
+          </div>
+
+          {/* FLECHAS MOBILE */}
+
+          <div className="flex items-center gap-2 sm:hidden">
+
+            <button
+              type="button"
+              onClick={scrollPrev}
+              aria-label="Vendedor anterior"
+              className="
+                flex
+                h-8
+                w-8
+                items-center
+                justify-center
+                rounded-lg
+                border
+                border-white/10
+                bg-[#0c192d]
+                text-slate-400
+                transition
+                hover:border-[#3169b7]
+                hover:text-white
+              "
+            >
+              <ChevronLeft size={15} />
+            </button>
+
+            <button
+              type="button"
+              onClick={scrollNext}
+              aria-label="Vendedor siguiente"
+              className="
+                flex
+                h-8
+                w-8
+                items-center
+                justify-center
+                rounded-lg
+                border
+                border-white/10
+                bg-[#0c192d]
+                text-slate-400
+                transition
+                hover:border-[#3169b7]
+                hover:text-white
+              "
+            >
+              <ChevronRight size={15} />
+            </button>
+
+          </div>
+
+          <span className="hidden text-[10px] text-slate-600 sm:block">
+            Deslizá para conocer al equipo
+          </span>
 
         </div>
 

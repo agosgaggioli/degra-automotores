@@ -2,10 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
+html,
 body {
-  font-family: 'Montserrat', sans-serif;
-  background-color: #071224;
-  color: #fff;
   margin: 0;
   padding: 0;
+  width: 100%;
+  min-height: 100%;
+  background-color: #071224;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  color: #ffffff;
+  overflow-x: hidden;
+}
+
+main {
+  background-color: #071224;
+}
+
+* {
+  box-sizing: border-box;
 }

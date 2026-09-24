@@ -9,6 +9,10 @@ import {
   CheckCircle2,
   Send,
   X,
+  ShieldCheck,
+  ClipboardCheck,
+  MessageCircle,
+  ArrowRight,
 } from 'lucide-react';
 
 import { submitConsignment } from '../../lib/api';
@@ -36,8 +40,11 @@ export default function ConsignacionPage() {
     images: [] as File[],
   });
 
-  const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] =
+    useState(false);
+
+  const [submitted, setSubmitted] =
+    useState(false);
 
   const [errors, setErrors] = useState<{
     [key: string]: string;
@@ -57,10 +64,16 @@ export default function ConsignacionPage() {
     'Secuencial',
   ];
 
+  /* =========================================
+     INPUTS
+  ========================================= */
+
   function handleChange(
     e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+      | HTMLInputElement
+      | HTMLTextAreaElement
+      | HTMLSelectElement
+    >,
   ) {
     const { name, value } = e.target;
 
@@ -77,15 +90,22 @@ export default function ConsignacionPage() {
     }
   }
 
+  /* =========================================
+     IMÁGENES
+  ========================================= */
+
   function handleFileChange(
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
   ) {
     if (!e.target.files) return;
 
-    const selectedFiles = Array.from(e.target.files);
+    const selectedFiles = Array.from(
+      e.target.files,
+    );
 
     const availableSlots =
-      MAX_IMAGES - formData.images.length;
+      MAX_IMAGES -
+      formData.images.length;
 
     if (availableSlots <= 0) {
       setErrors((prev) => ({
@@ -97,17 +117,24 @@ export default function ConsignacionPage() {
       return;
     }
 
-    const filesToAdd = selectedFiles.slice(
-      0,
-      availableSlots
-    );
+    const filesToAdd =
+      selectedFiles.slice(
+        0,
+        availableSlots,
+      );
 
     setFormData((prev) => ({
       ...prev,
-      images: [...prev.images, ...filesToAdd],
+      images: [
+        ...prev.images,
+        ...filesToAdd,
+      ],
     }));
 
-    if (selectedFiles.length > availableSlots) {
+    if (
+      selectedFiles.length >
+      availableSlots
+    ) {
       setErrors((prev) => ({
         ...prev,
         images: `Podés cargar un máximo de ${MAX_IMAGES} imágenes.`,
@@ -126,7 +153,8 @@ export default function ConsignacionPage() {
     setFormData((prev) => ({
       ...prev,
       images: prev.images.filter(
-        (_, imageIndex) => imageIndex !== index
+        (_, imageIndex) =>
+          imageIndex !== index,
       ),
     }));
 
@@ -136,62 +164,92 @@ export default function ConsignacionPage() {
     }));
   }
 
+  /* =========================================
+     VALIDACIÓN
+  ========================================= */
+
   function validate() {
     const newErrors: {
       [key: string]: string;
     } = {};
 
     if (!formData.firstName.trim()) {
-      newErrors.firstName = 'El nombre es obligatorio';
+      newErrors.firstName =
+        'El nombre es obligatorio';
     }
 
     if (!formData.lastName.trim()) {
-      newErrors.lastName = 'El apellido es obligatorio';
+      newErrors.lastName =
+        'El apellido es obligatorio';
     }
 
     if (!formData.phone.trim()) {
-      newErrors.phone = 'El teléfono es obligatorio';
+      newErrors.phone =
+        'El teléfono es obligatorio';
     }
 
     if (!formData.email.trim()) {
-      newErrors.email = 'El correo es obligatorio';
+      newErrors.email =
+        'El correo es obligatorio';
     }
 
     if (
       formData.email &&
-      !/\S+@\S+\.\S+/.test(formData.email)
+      !/\S+@\S+\.\S+/.test(
+        formData.email,
+      )
     ) {
-      newErrors.email = 'Ingresá un correo válido';
+      newErrors.email =
+        'Ingresá un correo válido';
     }
 
     if (!formData.brand.trim()) {
-      newErrors.brand = 'La marca es obligatoria';
+      newErrors.brand =
+        'La marca es obligatoria';
     }
 
     if (!formData.model.trim()) {
-      newErrors.model = 'El modelo es obligatorio';
+      newErrors.model =
+        'El modelo es obligatorio';
     }
 
     if (!formData.year.trim()) {
-      newErrors.year = 'El año es obligatorio';
+      newErrors.year =
+        'El año es obligatorio';
     }
 
-    if (formData.images.length > MAX_IMAGES) {
-      newErrors.images = `Solo podés subir hasta ${MAX_IMAGES} imágenes.`;
+    if (
+      formData.images.length >
+      MAX_IMAGES
+    ) {
+      newErrors.images =
+        `Solo podés subir hasta ${MAX_IMAGES} imágenes.`;
     }
 
     return newErrors;
   }
 
+  /* =========================================
+     SUBMIT
+  ========================================= */
+
   async function handleSubmit(
-    e: React.FormEvent
+    e: React.FormEvent,
   ) {
     e.preventDefault();
 
-    const validationErrors = validate();
+    const validationErrors =
+      validate();
 
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
+    if (
+      Object.keys(
+        validationErrors,
+      ).length > 0
+    ) {
+      setErrors(
+        validationErrors,
+      );
+
       return;
     }
 
@@ -200,23 +258,94 @@ export default function ConsignacionPage() {
 
     try {
       const fd = new FormData();
-      fd.append('firstName', formData.firstName);
-      fd.append('lastName', formData.lastName);
-      fd.append('phone', formData.phone);
-      fd.append('email', formData.email);
-      fd.append('city', formData.city);
-      fd.append('brand', formData.brand);
-      fd.append('model', formData.model);
-      fd.append('version', formData.version);
-      fd.append('year', formData.year);
-      fd.append('mileage', formData.mileage);
-      fd.append('licensePlate', formData.licensePlate);
-      fd.append('color', formData.color);
-      fd.append('fuel', formData.fuel);
-      fd.append('transmission', formData.transmission);
-      fd.append('expectedPrice', formData.expectedPrice);
-      fd.append('observations', formData.observations);
-      formData.images.forEach((image) => fd.append('images', image));
+
+      fd.append(
+        'firstName',
+        formData.firstName,
+      );
+
+      fd.append(
+        'lastName',
+        formData.lastName,
+      );
+
+      fd.append(
+        'phone',
+        formData.phone,
+      );
+
+      fd.append(
+        'email',
+        formData.email,
+      );
+
+      fd.append(
+        'city',
+        formData.city,
+      );
+
+      fd.append(
+        'brand',
+        formData.brand,
+      );
+
+      fd.append(
+        'model',
+        formData.model,
+      );
+
+      fd.append(
+        'version',
+        formData.version,
+      );
+
+      fd.append(
+        'year',
+        formData.year,
+      );
+
+      fd.append(
+        'mileage',
+        formData.mileage,
+      );
+
+      fd.append(
+        'licensePlate',
+        formData.licensePlate,
+      );
+
+      fd.append(
+        'color',
+        formData.color,
+      );
+
+      fd.append(
+        'fuel',
+        formData.fuel,
+      );
+
+      fd.append(
+        'transmission',
+        formData.transmission,
+      );
+
+      fd.append(
+        'expectedPrice',
+        formData.expectedPrice,
+      );
+
+      fd.append(
+        'observations',
+        formData.observations,
+      );
+
+      formData.images.forEach(
+        (image) =>
+          fd.append(
+            'images',
+            image,
+          ),
+      );
 
       await submitConsignment(fd);
 
@@ -224,12 +353,18 @@ export default function ConsignacionPage() {
     } catch (err: any) {
       setErrors((prev) => ({
         ...prev,
-        form: err.message || 'No pudimos enviar tu solicitud. Probá de nuevo en unos minutos.',
+        form:
+          err.message ||
+          'No pudimos enviar tu solicitud. Probá de nuevo en unos minutos.',
       }));
     } finally {
       setSubmitting(false);
     }
   }
+
+  /* =========================================
+     RESET
+  ========================================= */
 
   function resetForm() {
     setFormData({
@@ -256,172 +391,231 @@ export default function ConsignacionPage() {
     setSubmitted(false);
   }
 
+  /* =========================================
+     ÉXITO
+  ========================================= */
+
   if (submitted) {
     return (
-      <main className="min-h-screen bg-[#071224] px-4 py-20">
-        <div className="mx-auto max-w-xl rounded-3xl border border-white/10 bg-white p-8 text-center shadow-xl md:p-12">
+      <main className="min-h-screen bg-[#071224] px-4 py-24">
 
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#1f4e96]/10">
+        <div className="mx-auto max-w-lg rounded-2xl border border-white/10 bg-[#0c192d] p-8 text-center shadow-2xl">
+
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-blue-400/10 text-blue-300">
             <CheckCircle2
-              size={32}
-              className="text-[#1f4e96]"
+              size={28}
             />
           </div>
 
-          <h1 className="mt-5 text-3xl font-bold text-[#071224]">
+          <h1 className="mt-5 text-2xl font-semibold text-white">
             ¡Solicitud recibida!
           </h1>
 
-          <p className="mt-3 leading-relaxed text-gray-600">
+          <p className="mt-3 text-sm leading-6 text-slate-400">
             Recibimos los datos de tu vehículo.
-            Nuestro equipo va a revisar la información
-            y se pondrá en contacto con vos.
+            Nuestro equipo va a revisar la
+            información y se pondrá en contacto
+            con vos.
           </p>
 
           <button
             type="button"
             onClick={resetForm}
             className="
-              mt-7
-              rounded-xl
-              bg-[#071224]
-              px-6
-              py-3
+              mt-6
+              inline-flex
+              h-10
+              items-center
+              justify-center
+              rounded-lg
+              bg-[#1f4e96]
+              px-5
+              text-sm
               font-semibold
               text-white
               transition
-              hover:bg-[#1f4e96]
+              hover:bg-[#295eaa]
             "
           >
             Enviar otra consignación
           </button>
 
         </div>
+
       </main>
     );
   }
 
+  /* =========================================
+     PAGE
+  ========================================= */
+
   return (
-    <main className="min-h-screen bg-[#071224]">
+    <main className="min-h-screen bg-[#071224] text-white">
 
-      {/* ========================= */}
-      {/* HEADER */}
-      {/* ========================= */}
+      {/* =====================================
+          HERO
+      ===================================== */}
 
-      <section className="bg-[#071224] pb-16 pt-10 text-white">
+      <section className="relative overflow-hidden border-b border-white/10">
 
-        <div className="mx-auto max-w-5xl px-4 text-center sm:px-6">
+        <div className="pointer-events-none absolute -right-40 -top-48 h-[480px] w-[480px] rounded-full bg-[#1f4e96]/20 blur-[130px]" />
 
-          <span className="text-sm font-semibold uppercase tracking-[0.22em] text-[#7db4ff]">
+        <div className="pointer-events-none absolute -left-40 top-24 h-[350px] w-[350px] rounded-full bg-[#163b71]/15 blur-[120px]" />
+
+        <div className="relative mx-auto max-w-7xl px-4 pb-9 pt-28 sm:px-6 lg:px-8">
+
+          <span className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-300">
             Consignación
           </span>
 
-          <h1 className="mt-4 text-4xl font-bold tracking-tight text-white md:text-5xl lg:text-6xl">
-            Nosotros vendemos tu vehículo por vos
+          <h1 className="mt-3 max-w-3xl text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+            Vendemos tu vehículo por vos
           </h1>
 
-          <p className="mx-auto mt-5 max-w-3xl text-base leading-relaxed text-gray-200 md:text-lg">
-            Completá los datos de tu vehículo y nuestro equipo
-            se va a comunicar con vos para evaluar la unidad y
-            acompañarte durante todo el proceso.
+          <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-400 sm:text-base">
+            Completá los datos de la unidad y
+            nuestro equipo se va a comunicar
+            con vos para evaluarla y acompañarte
+            durante todo el proceso.
           </p>
 
         </div>
 
       </section>
 
-      {/* ========================= */}
-      {/* FORMULARIO */}
-      {/* ========================= */}
+      {/* =====================================
+          CONTENIDO
+      ===================================== */}
 
-      <section className="bg-[#071224] pb-16">
+      <section className="mx-auto max-w-7xl px-4 pb-20 pt-8 sm:px-6 lg:px-8">
 
-        <div className="mx-auto max-w-5xl px-4 sm:px-6">
+        <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
+
+          {/* =================================
+              FORM
+          ================================= */}
 
           <form
-            onSubmit={handleSubmit}
-            className="space-y-6"
+            onSubmit={
+              handleSubmit
+            }
+            className="space-y-5"
           >
 
-            {/* ========================= */}
-            {/* DATOS PERSONALES */}
-            {/* ========================= */}
+            {/* =================================
+                DATOS PERSONALES
+            ================================= */}
 
-            <section className="rounded-3xl border border-white/10 bg-white p-6 shadow-xl md:p-8">
+            <section className="rounded-2xl border border-white/10 bg-[#0c192d] p-5 md:p-6">
 
               <SectionTitle
-                icon={<User size={22} />}
-                title="Datos personales"
-                description="Contanos cómo podemos contactarte."
+                icon={
+                  <User size={18} />
+                }
+                title="Datos de contacto"
+                description="Información para poder comunicarnos con vos."
               />
 
-              <div className="mt-7 grid gap-5 md:grid-cols-2">
+              <div className="mt-5 grid gap-4 md:grid-cols-2">
 
                 <FormField
                   label="Nombre"
                   required
-                  error={errors.firstName}
+                  error={
+                    errors.firstName
+                  }
                 >
                   <input
                     type="text"
                     name="firstName"
-                    value={formData.firstName}
-                    onChange={handleChange}
+                    value={
+                      formData.firstName
+                    }
+                    onChange={
+                      handleChange
+                    }
                     placeholder="Ej. Juan"
-                    className={inputClass(
-                      !!errors.firstName
-                    )}
+                    className={
+                      inputClass(
+                        !!errors.firstName,
+                      )
+                    }
                   />
                 </FormField>
 
                 <FormField
                   label="Apellido"
                   required
-                  error={errors.lastName}
+                  error={
+                    errors.lastName
+                  }
                 >
                   <input
                     type="text"
                     name="lastName"
-                    value={formData.lastName}
-                    onChange={handleChange}
+                    value={
+                      formData.lastName
+                    }
+                    onChange={
+                      handleChange
+                    }
                     placeholder="Ej. Pérez"
-                    className={inputClass(
-                      !!errors.lastName
-                    )}
+                    className={
+                      inputClass(
+                        !!errors.lastName,
+                      )
+                    }
                   />
                 </FormField>
 
                 <FormField
                   label="Teléfono"
                   required
-                  error={errors.phone}
+                  error={
+                    errors.phone
+                  }
                 >
                   <input
                     type="tel"
                     name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
+                    value={
+                      formData.phone
+                    }
+                    onChange={
+                      handleChange
+                    }
                     placeholder="Ej. 351 1234567"
-                    className={inputClass(
-                      !!errors.phone
-                    )}
+                    className={
+                      inputClass(
+                        !!errors.phone,
+                      )
+                    }
                   />
                 </FormField>
 
                 <FormField
                   label="Email"
                   required
-                  error={errors.email}
+                  error={
+                    errors.email
+                  }
                 >
                   <input
                     type="email"
                     name="email"
-                    value={formData.email}
-                    onChange={handleChange}
+                    value={
+                      formData.email
+                    }
+                    onChange={
+                      handleChange
+                    }
                     placeholder="ejemplo@email.com"
-                    className={inputClass(
-                      !!errors.email
-                    )}
+                    className={
+                      inputClass(
+                        !!errors.email,
+                      )
+                    }
                   />
                 </FormField>
 
@@ -432,10 +626,16 @@ export default function ConsignacionPage() {
                     <input
                       type="text"
                       name="city"
-                      value={formData.city}
-                      onChange={handleChange}
+                      value={
+                        formData.city
+                      }
+                      onChange={
+                        handleChange
+                      }
                       placeholder="Ej. Córdoba"
-                      className={inputClass(false)}
+                      className={
+                        inputClass(false)
+                      }
                     />
 
                   </FormField>
@@ -446,19 +646,21 @@ export default function ConsignacionPage() {
 
             </section>
 
-            {/* ========================= */}
-            {/* DATOS DEL VEHÍCULO */}
-            {/* ========================= */}
+            {/* =================================
+                VEHÍCULO
+            ================================= */}
 
-            <section className="rounded-3xl border border-white/10 bg-white p-6 shadow-xl md:p-8">
+            <section className="rounded-2xl border border-white/10 bg-[#0c192d] p-5 md:p-6">
 
               <SectionTitle
-                icon={<CarFront size={22} />}
+                icon={
+                  <CarFront size={18} />
+                }
                 title="Datos del vehículo"
                 description="Completá la información principal de la unidad."
               />
 
-              <div className="mt-7 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+              <div className="mt-5 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 
                 <FormField
                   label="Marca"
@@ -468,12 +670,18 @@ export default function ConsignacionPage() {
                   <input
                     type="text"
                     name="brand"
-                    value={formData.brand}
-                    onChange={handleChange}
+                    value={
+                      formData.brand
+                    }
+                    onChange={
+                      handleChange
+                    }
                     placeholder="Ej. Toyota"
-                    className={inputClass(
-                      !!errors.brand
-                    )}
+                    className={
+                      inputClass(
+                        !!errors.brand,
+                      )
+                    }
                   />
                 </FormField>
 
@@ -485,12 +693,18 @@ export default function ConsignacionPage() {
                   <input
                     type="text"
                     name="model"
-                    value={formData.model}
-                    onChange={handleChange}
+                    value={
+                      formData.model
+                    }
+                    onChange={
+                      handleChange
+                    }
                     placeholder="Ej. Hilux"
-                    className={inputClass(
-                      !!errors.model
-                    )}
+                    className={
+                      inputClass(
+                        !!errors.model,
+                      )
+                    }
                   />
                 </FormField>
 
@@ -498,10 +712,16 @@ export default function ConsignacionPage() {
                   <input
                     type="text"
                     name="version"
-                    value={formData.version}
-                    onChange={handleChange}
+                    value={
+                      formData.version
+                    }
+                    onChange={
+                      handleChange
+                    }
                     placeholder="Ej. SRX 2.8"
-                    className={inputClass(false)}
+                    className={
+                      inputClass(false)
+                    }
                   />
                 </FormField>
 
@@ -513,14 +733,23 @@ export default function ConsignacionPage() {
                   <input
                     type="number"
                     name="year"
-                    value={formData.year}
-                    onChange={handleChange}
+                    value={
+                      formData.year
+                    }
+                    onChange={
+                      handleChange
+                    }
                     placeholder="Ej. 2023"
                     min={1950}
-                    max={new Date().getFullYear() + 1}
-                    className={inputClass(
-                      !!errors.year
-                    )}
+                    max={
+                      new Date().getFullYear() +
+                      1
+                    }
+                    className={
+                      inputClass(
+                        !!errors.year,
+                      )
+                    }
                   />
                 </FormField>
 
@@ -528,11 +757,17 @@ export default function ConsignacionPage() {
                   <input
                     type="number"
                     name="mileage"
-                    value={formData.mileage}
-                    onChange={handleChange}
+                    value={
+                      formData.mileage
+                    }
+                    onChange={
+                      handleChange
+                    }
                     placeholder="Ej. 45000"
                     min={0}
-                    className={inputClass(false)}
+                    className={
+                      inputClass(false)
+                    }
                   />
                 </FormField>
 
@@ -540,10 +775,16 @@ export default function ConsignacionPage() {
                   <input
                     type="text"
                     name="licensePlate"
-                    value={formData.licensePlate}
-                    onChange={handleChange}
+                    value={
+                      formData.licensePlate
+                    }
+                    onChange={
+                      handleChange
+                    }
                     placeholder="Ej. AB123CD"
-                    className={inputClass(false)}
+                    className={
+                      inputClass(false)
+                    }
                   />
                 </FormField>
 
@@ -551,315 +792,415 @@ export default function ConsignacionPage() {
                   <input
                     type="text"
                     name="color"
-                    value={formData.color}
-                    onChange={handleChange}
+                    value={
+                      formData.color
+                    }
+                    onChange={
+                      handleChange
+                    }
                     placeholder="Ej. Gris"
-                    className={inputClass(false)}
+                    className={
+                      inputClass(false)
+                    }
                   />
                 </FormField>
 
                 <FormField label="Combustible">
-
                   <select
                     name="fuel"
-                    value={formData.fuel}
-                    onChange={handleChange}
-                    className={inputClass(false)}
+                    value={
+                      formData.fuel
+                    }
+                    onChange={
+                      handleChange
+                    }
+                    className={
+                      inputClass(false)
+                    }
                   >
-
                     <option value="">
                       Seleccionar
                     </option>
 
-                    {fuels.map((fuel) => (
-                      <option
-                        key={fuel}
-                        value={fuel}
-                      >
-                        {fuel}
-                      </option>
-                    ))}
-
+                    {fuels.map(
+                      (fuel) => (
+                        <option
+                          key={fuel}
+                          value={fuel}
+                        >
+                          {fuel}
+                        </option>
+                      ),
+                    )}
                   </select>
-
                 </FormField>
 
                 <FormField label="Transmisión">
-
                   <select
                     name="transmission"
-                    value={formData.transmission}
-                    onChange={handleChange}
-                    className={inputClass(false)}
+                    value={
+                      formData.transmission
+                    }
+                    onChange={
+                      handleChange
+                    }
+                    className={
+                      inputClass(false)
+                    }
                   >
-
                     <option value="">
                       Seleccionar
                     </option>
 
                     {transmissions.map(
-                      (transmission) => (
+                      (
+                        transmission,
+                      ) => (
                         <option
-                          key={transmission}
-                          value={transmission}
+                          key={
+                            transmission
+                          }
+                          value={
+                            transmission
+                          }
                         >
-                          {transmission}
+                          {
+                            transmission
+                          }
                         </option>
-                      )
+                      ),
                     )}
-
                   </select>
-
                 </FormField>
 
-              </div>
-
-            </section>
-
-            {/* ========================= */}
-            {/* INFORMACIÓN ADICIONAL */}
-            {/* ========================= */}
-
-            <section className="rounded-3xl border border-white/10 bg-white p-6 shadow-xl md:p-8">
-
-              <h2 className="text-xl font-bold text-[#071224]">
-                Información adicional
-              </h2>
-
-              <p className="mt-1 text-sm text-gray-500">
-                Estos datos nos ayudan a tener una primera referencia
-                de tu vehículo.
-              </p>
-
-              <div className="mt-6 grid gap-5 md:grid-cols-2">
-
                 <FormField label="Precio pretendido">
-
                   <input
                     type="number"
                     name="expectedPrice"
-                    value={formData.expectedPrice}
-                    onChange={handleChange}
+                    value={
+                      formData.expectedPrice
+                    }
+                    onChange={
+                      handleChange
+                    }
                     placeholder="Ej. 25000000"
                     min={0}
-                    className={inputClass(false)}
+                    className={
+                      inputClass(false)
+                    }
                   />
-
                 </FormField>
 
-                <FormField label="Observaciones">
+                <div className="md:col-span-2 lg:col-span-2">
 
-                  <textarea
-                    name="observations"
-                    value={formData.observations}
-                    onChange={handleChange}
-                    rows={4}
-                    placeholder="Contanos cualquier detalle que consideres importante..."
-                    className={`${inputClass(
-                      false
-                    )} resize-none`}
-                  />
-
-                </FormField>
-
-              </div>
-
-            </section>
-
-            {/* ========================= */}
-            {/* IMÁGENES */}
-            {/* ========================= */}
-
-            <section className="rounded-3xl border border-white/10 bg-white p-6 shadow-xl md:p-8">
-
-              <SectionTitle
-                icon={<ImagePlus size={22} />}
-                title="Imágenes del vehículo"
-                description="Podés cargar hasta 5 imágenes de la unidad."
-              />
-
-              <div className="mt-6">
-
-                <label
-                  className={`
-                    flex
-                    min-h-[150px]
-                    flex-col
-                    items-center
-                    justify-center
-                    rounded-2xl
-                    border-2
-                    border-dashed
-                    px-6
-                    py-8
-                    text-center
-                    transition
-                    ${
-                      formData.images.length >= MAX_IMAGES
-                        ? 'cursor-not-allowed border-gray-200 bg-gray-50 opacity-60'
-                        : 'cursor-pointer border-gray-300 bg-gray-50 hover:border-[#1f4e96] hover:bg-[#1f4e96]/5'
-                    }
-                  `}
-                >
-
-                  <ImagePlus
-                    size={30}
-                    className="text-[#1f4e96]"
-                  />
-
-                  <span className="mt-3 font-semibold text-[#071224]">
-                    {formData.images.length >= MAX_IMAGES
-                      ? 'Llegaste al máximo de imágenes'
-                      : 'Seleccionar imágenes'}
-                  </span>
-
-                  <span className="mt-1 text-sm text-gray-500">
-                    JPG, PNG o WEBP • máximo 5 imágenes
-                  </span>
-
-                  <input
-                    type="file"
-                    multiple
-                    accept="image/jpeg,image/png,image/webp"
-                    onChange={handleFileChange}
-                    disabled={
-                      formData.images.length >= MAX_IMAGES
-                    }
-                    className="hidden"
-                  />
-
-                </label>
-
-                <div className="mt-3 flex items-center justify-between">
-
-                  <p className="text-sm text-gray-500">
-                    {formData.images.length} de{' '}
-                    {MAX_IMAGES} imágenes seleccionadas
-                  </p>
-
-                  {formData.images.length > 0 &&
-                    formData.images.length < MAX_IMAGES && (
-                      <p className="text-sm font-semibold text-[#1f4e96]">
-                        {MAX_IMAGES -
-                          formData.images.length}{' '}
-                        disponibles
-                      </p>
-                    )}
+                  <FormField label="Observaciones">
+                    <textarea
+                      name="observations"
+                      value={
+                        formData.observations
+                      }
+                      onChange={
+                        handleChange
+                      }
+                      rows={3}
+                      placeholder="Contanos cualquier detalle que consideres importante..."
+                      className={`${inputClass(
+                        false,
+                      )} min-h-[90px] resize-none`}
+                    />
+                  </FormField>
 
                 </div>
 
-                {errors.images && (
-                  <p className="mt-2 text-sm font-medium text-red-600">
-                    {errors.images}
-                  </p>
-                )}
+              </div>
 
-                {formData.images.length > 0 && (
-                  <div className="mt-5 grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+              {/* =============================
+                  IMÁGENES
+              ============================= */}
 
-                    {formData.images.map(
-                      (image, index) => (
-                        <div
-                          key={`${image.name}-${index}`}
-                          className="relative overflow-hidden rounded-xl border border-gray-200 bg-gray-50 p-3"
-                        >
+              <div className="mt-6 border-t border-white/10 pt-5">
 
-                          <div className="flex h-24 items-center justify-center rounded-lg bg-gray-100 px-2">
+                <div className="flex items-center gap-2">
 
-                            <p className="line-clamp-2 break-all text-center text-xs font-medium text-gray-600">
-                              {image.name}
+                  <ImagePlus
+                    size={17}
+                    className="text-blue-300"
+                  />
+
+                  <div>
+                    <h3 className="text-sm font-semibold text-white">
+                      Imágenes del vehículo
+                    </h3>
+
+                    <p className="mt-0.5 text-xs text-slate-500">
+                      Podés cargar hasta 5 imágenes.
+                    </p>
+                  </div>
+
+                </div>
+
+                <div className="mt-4">
+
+                  <label
+                    className={`
+                      flex
+                      min-h-[105px]
+                      cursor-pointer
+                      flex-col
+                      items-center
+                      justify-center
+                      rounded-xl
+                      border
+                      border-dashed
+                      px-5
+                      py-5
+                      text-center
+                      transition
+                      ${
+                        formData.images.length >=
+                        MAX_IMAGES
+                          ? 'cursor-not-allowed border-white/10 bg-white/[0.02] opacity-50'
+                          : 'border-white/15 bg-[#071224] hover:border-[#3169b7] hover:bg-[#0a172b]'
+                      }
+                    `}
+                  >
+
+                    <ImagePlus
+                      size={23}
+                      className="text-blue-300"
+                    />
+
+                    <span className="mt-2 text-sm font-medium text-slate-300">
+                      {formData.images.length >=
+                      MAX_IMAGES
+                        ? 'Llegaste al máximo de imágenes'
+                        : 'Seleccionar imágenes'}
+                    </span>
+
+                    <span className="mt-1 text-[11px] text-slate-600">
+                      JPG, PNG o WEBP
+                    </span>
+
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/jpeg,image/png,image/webp"
+                      onChange={
+                        handleFileChange
+                      }
+                      disabled={
+                        formData.images.length >=
+                        MAX_IMAGES
+                      }
+                      className="hidden"
+                    />
+
+                  </label>
+
+                  {errors.images && (
+                    <p className="mt-2 text-xs font-medium text-red-400">
+                      {errors.images}
+                    </p>
+                  )}
+
+                  {formData.images.length >
+                    0 && (
+                    <div className="mt-4 grid gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+
+                      {formData.images.map(
+                        (
+                          image,
+                          index,
+                        ) => (
+                          <div
+                            key={`${image.name}-${index}`}
+                            className="relative rounded-lg border border-white/10 bg-[#071224] p-2.5"
+                          >
+
+                            <div className="flex h-16 items-center justify-center rounded-md bg-white/[0.03] px-2">
+
+                              <p className="line-clamp-2 break-all text-center text-[10px] text-slate-400">
+                                {
+                                  image.name
+                                }
+                              </p>
+
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={() =>
+                                removeImage(
+                                  index,
+                                )
+                              }
+                              className="
+                                absolute
+                                right-1
+                                top-1
+                                flex
+                                h-6
+                                w-6
+                                items-center
+                                justify-center
+                                rounded-full
+                                bg-[#071224]
+                                text-slate-400
+                                transition
+                                hover:bg-red-600
+                                hover:text-white
+                              "
+                            >
+                              <X size={13} />
+                            </button>
+
+                            <p className="mt-1.5 text-center text-[10px] font-medium text-blue-300">
+                              Foto {index + 1}
                             </p>
 
                           </div>
+                        ),
+                      )}
 
-                          <button
-                            type="button"
-                            onClick={() =>
-                              removeImage(index)
-                            }
-                            className="
-                              absolute
-                              right-1.5
-                              top-1.5
-                              flex
-                              h-7
-                              w-7
-                              items-center
-                              justify-center
-                              rounded-full
-                              bg-[#071224]
-                              text-white
-                              shadow
-                              transition
-                              hover:bg-red-600
-                            "
-                          >
-                            <X size={15} />
-                          </button>
+                    </div>
+                  )}
 
-                          <p className="mt-2 text-center text-xs font-semibold text-[#1f4e96]">
-                            Foto {index + 1}
-                          </p>
+                  <p className="mt-3 text-[11px] text-slate-600">
+                    {
+                      formData.images.length
+                    }{' '}
+                    de {MAX_IMAGES} imágenes
+                    seleccionadas
+                  </p>
 
-                        </div>
-                      )
-                    )}
-
-                  </div>
-                )}
+                </div>
 
               </div>
 
             </section>
 
-            {/* ========================= */}
-            {/* BOTÓN */}
-            {/* ========================= */}
+            {/* ERROR GENERAL */}
 
             {errors.form && (
-              <p className="text-center text-sm font-medium text-red-500">
+              <div className="rounded-lg border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-300">
                 {errors.form}
-              </p>
+              </div>
             )}
 
-            <div className="flex justify-center pb-6 pt-4">
+            {/* SUBMIT */}
 
-              <button
-                type="submit"
-                disabled={submitting}
-                className="
-                  inline-flex
-                  min-w-[230px]
-                  items-center
-                  justify-center
-                  gap-2
-                  rounded-xl
-                  bg-[#1f4e96]
-                  px-8
-                  py-3.5
-                  font-semibold
-                  text-white
-                  shadow-lg
-                  transition-all
-                  duration-300
-                  hover:-translate-y-0.5
-                  hover:bg-[#163b71]
-                  disabled:cursor-not-allowed
-                  disabled:opacity-60
-                "
-              >
+            <button
+              type="submit"
+              disabled={submitting}
+              className="
+                flex
+                h-11
+                w-full
+                items-center
+                justify-center
+                gap-2
+                rounded-lg
+                bg-[#1f4e96]
+                px-6
+                text-sm
+                font-semibold
+                text-white
+                transition
+                hover:bg-[#295eaa]
+                disabled:cursor-not-allowed
+                disabled:opacity-60
+                md:w-fit
+              "
+            >
+              <Send size={16} />
 
-                <Send size={18} />
+              {submitting
+                ? 'Enviando...'
+                : 'Enviar solicitud'}
 
-                {submitting
-                  ? 'Enviando...'
-                  : 'Enviar solicitud'}
+              {!submitting && (
+                <ArrowRight
+                  size={14}
+                />
+              )}
 
-              </button>
+            </button>
+
+          </form>
+
+          {/* =================================
+              ASIDE
+          ================================= */}
+
+          <aside className="h-fit lg:sticky lg:top-24">
+
+            <div className="rounded-2xl border border-white/10 bg-[#0c192d] p-5">
+
+              <p className="text-xs font-semibold uppercase tracking-[0.15em] text-blue-300">
+                ¿Cómo funciona?
+              </p>
+
+              <div className="mt-5 space-y-5">
+
+                <ProcessItem
+                  number="01"
+                  icon={
+                    <ClipboardCheck
+                      size={16}
+                    />
+                  }
+                  title="Enviás los datos"
+                  description="Completás la información básica de tu vehículo."
+                />
+
+                <ProcessItem
+                  number="02"
+                  icon={
+                    <CarFront
+                      size={16}
+                    />
+                  }
+                  title="Evaluamos la unidad"
+                  description="Nuestro equipo revisa la información y se contacta con vos."
+                />
+
+                <ProcessItem
+                  number="03"
+                  icon={
+                    <MessageCircle
+                      size={16}
+                    />
+                  }
+                  title="Coordinamos la venta"
+                  description="Te acompañamos durante todo el proceso de consignación."
+                />
+
+              </div>
+
+              <div className="mt-6 border-t border-white/10 pt-5">
+
+                <div className="flex gap-3">
+
+                  <ShieldCheck
+                    size={18}
+                    className="mt-0.5 shrink-0 text-blue-300"
+                  />
+
+                  <p className="text-xs leading-5 text-slate-500">
+                    Cargar tus datos no implica
+                    ningún compromiso. Nuestro
+                    equipo primero evalúa la unidad
+                    y luego coordina con vos los
+                    próximos pasos.
+                  </p>
+
+                </div>
+
+              </div>
 
             </div>
 
-          </form>
+          </aside>
 
         </div>
 
@@ -869,9 +1210,9 @@ export default function ConsignacionPage() {
   );
 }
 
-/* ========================= */
-/* SECTION TITLE */
-/* ========================= */
+/* =========================================
+   SECTION TITLE
+========================================= */
 
 interface SectionTitleProps {
   icon: React.ReactNode;
@@ -887,41 +1228,37 @@ function SectionTitle({
   return (
     <div className="flex items-start gap-3">
 
-      <div
-        className="
-          flex
-          h-11
-          w-11
-          flex-shrink-0
-          items-center
-          justify-center
-          rounded-xl
-          bg-[#1f4e96]/10
-          text-[#1f4e96]
-        "
-      >
+      <div className="
+        flex
+        h-9
+        w-9
+        shrink-0
+        items-center
+        justify-center
+        rounded-lg
+        bg-[#1f4e96]/15
+        text-blue-300
+      ">
         {icon}
       </div>
 
       <div>
-
-        <h2 className="text-xl font-bold text-[#071224]">
+        <h2 className="text-base font-semibold text-white">
           {title}
         </h2>
 
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-0.5 text-xs text-slate-500">
           {description}
         </p>
-
       </div>
 
     </div>
   );
 }
 
-/* ========================= */
-/* FORM FIELD */
-/* ========================= */
+/* =========================================
+   FORM FIELD
+========================================= */
 
 interface FormFieldProps {
   label: string;
@@ -939,12 +1276,12 @@ function FormField({
   return (
     <div>
 
-      <label className="mb-2 block text-sm font-semibold text-gray-700">
+      <label className="mb-1.5 block text-xs font-medium text-slate-300">
 
         {label}
 
         {required && (
-          <span className="ml-1 text-red-500">
+          <span className="ml-1 text-red-400">
             *
           </span>
         )}
@@ -954,7 +1291,7 @@ function FormField({
       {children}
 
       {error && (
-        <p className="mt-1.5 text-sm font-medium text-red-600">
+        <p className="mt-1.5 text-xs font-medium text-red-400">
           {error}
         </p>
       )}
@@ -963,33 +1300,84 @@ function FormField({
   );
 }
 
-/* ========================= */
-/* INPUT STYLE */
-/* ========================= */
+/* =========================================
+   PROCESS ITEM
+========================================= */
 
-function inputClass(hasError: boolean) {
+interface ProcessItemProps {
+  number: string;
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+}
+
+function ProcessItem({
+  number,
+  icon,
+  title,
+  description,
+}: ProcessItemProps) {
+  return (
+    <div className="flex gap-3">
+
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#1f4e96]/15 text-blue-300">
+        {icon}
+      </div>
+
+      <div>
+
+        <div className="flex items-center gap-2">
+
+          <span className="text-[9px] font-bold tracking-wider text-slate-600">
+            {number}
+          </span>
+
+          <h3 className="text-sm font-medium text-slate-200">
+            {title}
+          </h3>
+
+        </div>
+
+        <p className="mt-1 text-xs leading-5 text-slate-500">
+          {description}
+        </p>
+
+      </div>
+
+    </div>
+  );
+}
+
+/* =========================================
+   INPUT STYLE
+========================================= */
+
+function inputClass(
+  hasError: boolean,
+) {
   return `
+    h-10
     w-full
-    rounded-xl
+    rounded-lg
     border
     ${
       hasError
-        ? 'border-red-500'
-        : 'border-gray-200'
+        ? 'border-red-400'
+        : 'border-white/10'
     }
-    bg-gray-50
-    px-4
-    py-3
-    text-sm
-    text-gray-900
+    bg-[#071224]
+    px-3
+    text-xs
+    text-white
     outline-none
     transition
-    placeholder:text-gray-400
-    focus:bg-white
+    placeholder:text-slate-600
+    hover:border-white/20
+    focus:bg-[#071224]
     ${
       hasError
-        ? 'focus:border-red-500 focus:ring-2 focus:ring-red-100'
-        : 'focus:border-[#1f4e96] focus:ring-2 focus:ring-[#1f4e96]/10'
+        ? 'focus:border-red-400 focus:ring-2 focus:ring-red-400/10'
+        : 'focus:border-[#3169b7] focus:ring-2 focus:ring-[#3169b7]/15'
     }
   `;
 }

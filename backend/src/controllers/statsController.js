@@ -3,7 +3,15 @@ const { supabase } = require('../config/supabase');
 // GET /api/admin/stats (protegido) - números para el dashboard del backoffice
 async function getStats(req, res, next) {
   try {
-    const [vehiclesPublished, vehiclesDraft, vehiclesSold, consignmentsPending, contactNew, consignmentsTotal] =
+    const [
+      vehiclesPublished,
+      vehiclesDraft,
+      vehiclesSold,
+      consignmentsPending,
+      contactNew,
+      consignmentsTotal,
+      financingsPublished,
+    ] =
       await Promise.all([
         supabase.from('vehicles').select('id', { count: 'exact', head: true }).eq('status', 'published'),
         supabase.from('vehicles').select('id', { count: 'exact', head: true }).eq('status', 'draft'),
@@ -11,6 +19,7 @@ async function getStats(req, res, next) {
         supabase.from('consignments').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
         supabase.from('contact_messages').select('id', { count: 'exact', head: true }).eq('status', 'new'),
         supabase.from('consignments').select('id', { count: 'exact', head: true }),
+        supabase.from('financings').select('id', { count: 'exact', head: true }).eq('status', 'published'),
       ]);
 
     return res.json({
@@ -25,6 +34,9 @@ async function getStats(req, res, next) {
       },
       contact: {
         new: contactNew.count || 0,
+      },
+      financings: {
+        published: financingsPublished.count || 0,
       },
     });
   } catch (err) {

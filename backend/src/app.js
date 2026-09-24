@@ -10,6 +10,7 @@ const vehiclesRoutes = require('./routes/vehicles');
 const consignmentsRoutes = require('./routes/consignments');
 const contactRoutes = require('./routes/contact');
 const adminRoutes = require('./routes/admin');
+const financingsRoutes = require('./routes/financings');
 const { notFound, errorHandler } = require('./middleware/errorHandler');
 
 const app = express();
@@ -46,6 +47,7 @@ app.use('/api/vehicles', vehiclesRoutes);
 app.use('/api/consignments', consignmentsRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/financings', financingsRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

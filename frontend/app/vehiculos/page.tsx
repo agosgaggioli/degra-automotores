@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
@@ -13,11 +13,23 @@ import {
   Settings2,
   ChevronLeft,
   ChevronRight,
+  ArrowRight,
 } from 'lucide-react';
 
-import { fetchVehicles, fetchVehicleFilters, Vehicle, VehicleFilters } from '../../lib/api';
+import {
+  fetchVehicles,
+  fetchVehicleFilters,
+  Vehicle,
+  VehicleFilters,
+} from '../../lib/api';
 
-const ITEMS_PER_PAGE = 6;
+/*
+  12 queda mucho mejor visualmente:
+  - desktop: 4 columnas x 3 filas
+  - evita páginas con 1 solo vehículo en catálogos chicos
+*/
+const ITEMS_PER_PAGE = 12;
+
 const FALLBACK_IMG = '/images/vehicles/onix.jpeg';
 
 export default function VehiculosPage() {
@@ -27,25 +39,48 @@ export default function VehiculosPage() {
   const [selectedBrand, setSelectedBrand] = useState('');
   const [selectedTransmission, setSelectedTransmission] = useState('');
   const [selectedFuel, setSelectedFuel] = useState('');
+
   const [yearMin, setYearMin] = useState<number | ''>('');
   const [yearMax, setYearMax] = useState<number | ''>('');
+
   const [page, setPage] = useState(1);
 
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [total, setTotal] = useState(0);
   const [pageCount, setPageCount] = useState(1);
-  const [filters, setFilters] = useState<VehicleFilters>({ brands: [], transmissions: [], fuels: [] });
+
+  const [filters, setFilters] = useState<VehicleFilters>({
+    brands: [],
+    transmissions: [],
+    fuels: [],
+  });
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  /* ================================
+     CARGAR FILTROS
+  ================================= */
 
   useEffect(() => {
     fetchVehicleFilters()
       .then(setFilters)
-      .catch(() => setFilters({ brands: [], transmissions: [], fuels: [] }));
+      .catch(() =>
+        setFilters({
+          brands: [],
+          transmissions: [],
+          fuels: [],
+        }),
+      );
   }, []);
+
+  /* ================================
+     CARGAR VEHÍCULOS
+  ================================= */
 
   useEffect(() => {
     let cancelled = false;
+
     setLoading(true);
     setError('');
 
@@ -61,27 +96,72 @@ export default function VehiculosPage() {
     })
       .then((res) => {
         if (cancelled) return;
+
         setVehicles(res.data);
         setTotal(res.pagination.total);
-        setPageCount(Math.max(res.pagination.totalPages, 1));
+
+        const calculatedPages = Math.max(
+          res.pagination.totalPages,
+          1,
+        );
+
+        setPageCount(calculatedPages);
+
+        /*
+          Si por algún filtro o eliminación la página actual
+          deja de existir, vuelve automáticamente a la última válida.
+        */
+        if (page > calculatedPages) {
+          setPage(calculatedPages);
+        }
       })
       .catch((err) => {
         if (cancelled) return;
-        setError(err.message || 'No pudimos cargar los vehículos. Probá de nuevo en unos minutos.');
+
+        setError(
+          err.message ||
+            'No pudimos cargar los vehículos. Probá de nuevo en unos minutos.',
+        );
+
         setVehicles([]);
       })
       .finally(() => {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       });
 
     return () => {
       cancelled = true;
     };
-  }, [search, selectedBrand, selectedTransmission, selectedFuel, yearMin, yearMax, page]);
+  }, [
+    search,
+    selectedBrand,
+    selectedTransmission,
+    selectedFuel,
+    yearMin,
+    yearMax,
+    page,
+  ]);
+
+  /* ================================
+     VOLVER A PÁGINA 1 AL FILTRAR
+  ================================= */
 
   useEffect(() => {
     setPage(1);
-  }, [search, selectedBrand, selectedTransmission, selectedFuel, yearMin, yearMax]);
+  }, [
+    search,
+    selectedBrand,
+    selectedTransmission,
+    selectedFuel,
+    yearMin,
+    yearMax,
+  ]);
+
+  /* ================================
+     LIMPIAR FILTROS
+  ================================= */
 
   const clearFilters = () => {
     setSearch('');
@@ -101,7 +181,14 @@ export default function VehiculosPage() {
     yearMin !== '' ||
     yearMax !== '';
 
-  const formatPrice = (price: number, currency: string) => {
+  /* ================================
+     PRECIO
+  ================================= */
+
+  const formatPrice = (
+    price: number,
+    currency: string,
+  ) => {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
       currency: currency || 'ARS',
@@ -109,254 +196,682 @@ export default function VehiculosPage() {
     }).format(price);
   };
 
+  /* ================================
+     CAMBIO DE PÁGINA
+  ================================= */
+
+  const changePage = (newPage: number) => {
+    if (newPage < 1 || newPage > pageCount) return;
+
+    setPage(newPage);
+
+    /*
+      Al cambiar de página vuelve arriba del catálogo
+      en vez de quedarse abajo.
+    */
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  };
+
   return (
-    <main className="min-h-screen bg-[#f3f4f6]">
-      <section className="bg-[#071224] py-16 text-white">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <span className="text-sm font-semibold uppercase tracking-[0.18em] text-blue-300">
+    <main className="min-h-screen bg-[#071224] text-white">
+
+      {/* ==================================
+          CABECERA
+      ================================== */}
+
+      <section className="relative overflow-hidden border-b border-white/10">
+        {/* luces muy suaves de fondo */}
+        <div className="pointer-events-none absolute -right-48 -top-48 h-[500px] w-[500px] rounded-full bg-[#1f4e96]/20 blur-[120px]" />
+
+        <div className="pointer-events-none absolute -left-48 top-20 h-[400px] w-[400px] rounded-full bg-blue-900/10 blur-[120px]" />
+
+        <div className="relative mx-auto max-w-7xl px-4 pb-10 pt-28 sm:px-6 lg:px-8">
+
+          <span className="text-xs font-semibold uppercase tracking-[0.22em] text-blue-300">
             Nuestro stock
           </span>
-          <h1 className="mt-3 text-4xl font-bold md:text-5xl">Catálogo de vehículos</h1>
-          <p className="mt-4 max-w-2xl text-gray-300 md:text-lg">
-            Buscá por marca, modelo, año y características para encontrar el vehículo ideal para vos.
+
+          <h1 className="mt-3 text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
+            Catálogo de vehículos
+          </h1>
+
+          <p className="mt-4 max-w-xl text-sm leading-6 text-slate-400 sm:text-base">
+            Encontrá tu próximo vehículo entre nuestras
+            unidades disponibles.
           </p>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        {/* FILTROS */}
-        <div className="mb-8 rounded-3xl border border-gray-200 bg-white p-5 shadow-sm md:p-6">
+      {/* ==================================
+          CATÁLOGO
+      ================================== */}
+
+      <section className="mx-auto max-w-7xl px-4 pb-20 pt-8 sm:px-6 lg:px-8">
+
+        {/* ==================================
+            FILTROS
+        ================================== */}
+
+        <div className="mb-10 rounded-2xl border border-white/10 bg-[#0c192d] p-5 shadow-2xl shadow-black/20 md:p-6">
+
+          {/* título filtros */}
           <div className="mb-5 flex items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <SlidersHorizontal size={20} className="text-[#1f4e96]" />
-              <h2 className="text-lg font-bold text-gray-900">Filtrar vehículos</h2>
+
+            <div className="flex items-center gap-3">
+
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-blue-400/20 bg-blue-400/10 text-blue-300">
+                <SlidersHorizontal size={17} />
+              </div>
+
+              <div>
+                <h2 className="text-sm font-semibold text-white">
+                  Filtrar vehículos
+                </h2>
+
+                <p className="mt-0.5 hidden text-xs text-slate-500 sm:block">
+                  Refiná tu búsqueda según tus preferencias
+                </p>
+              </div>
             </div>
 
             {hasActiveFilters && (
               <button
                 type="button"
                 onClick={clearFilters}
-                className="flex items-center gap-1.5 text-sm font-semibold text-gray-500 transition hover:text-[#1f4e96]"
+                className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium text-slate-400 transition hover:bg-white/5 hover:text-white"
               >
-                <X size={17} />
+                <X size={15} />
                 Limpiar filtros
               </button>
             )}
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-            <div className="relative sm:col-span-2 lg:col-span-3 xl:col-span-2">
-              <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          {/* filtros */}
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+
+            {/* buscador */}
+            <div className="relative sm:col-span-2">
+
+              <Search
+                size={16}
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"
+              />
+
               <input
                 type="text"
-                placeholder="Buscar marca, modelo, versión..."
+                placeholder="Buscar por marca, modelo o versión..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 pl-10 pr-4 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-[#1f4e96] focus:bg-white focus:ring-2 focus:ring-[#1f4e96]/10"
+                className="
+                  h-11
+                  w-full
+                  rounded-lg
+                  border
+                  border-white/10
+                  bg-[#071224]
+                  pl-10
+                  pr-4
+                  text-sm
+                  text-white
+                  outline-none
+                  transition
+                  placeholder:text-slate-600
+                  hover:border-white/20
+                  focus:border-[#3169b7]
+                  focus:ring-2
+                  focus:ring-[#3169b7]/20
+                "
               />
             </div>
 
+            {/* marca */}
             <select
               value={selectedBrand}
-              onChange={(e) => setSelectedBrand(e.target.value)}
-              className="h-11 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm text-gray-700 outline-none transition focus:border-[#1f4e96] focus:bg-white"
+              onChange={(e) =>
+                setSelectedBrand(e.target.value)
+              }
+              className="
+                h-11
+                w-full
+                rounded-lg
+                border
+                border-white/10
+                bg-[#071224]
+                px-3
+                text-sm
+                text-slate-300
+                outline-none
+                transition
+                hover:border-white/20
+                focus:border-[#3169b7]
+                focus:ring-2
+                focus:ring-[#3169b7]/20
+              "
             >
-              <option value="">Todas las marcas</option>
+              <option value="">
+                Todas las marcas
+              </option>
+
               {filters.brands.map((brand) => (
-                <option key={brand} value={brand}>
+                <option
+                  key={brand}
+                  value={brand}
+                  className="bg-[#071224]"
+                >
                   {brand}
                 </option>
               ))}
             </select>
 
+            {/* transmisión */}
             <select
               value={selectedTransmission}
-              onChange={(e) => setSelectedTransmission(e.target.value)}
-              className="h-11 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm text-gray-700 outline-none transition focus:border-[#1f4e96] focus:bg-white"
+              onChange={(e) =>
+                setSelectedTransmission(e.target.value)
+              }
+              className="
+                h-11
+                w-full
+                rounded-lg
+                border
+                border-white/10
+                bg-[#071224]
+                px-3
+                text-sm
+                text-slate-300
+                outline-none
+                transition
+                hover:border-white/20
+                focus:border-[#3169b7]
+                focus:ring-2
+                focus:ring-[#3169b7]/20
+              "
             >
-              <option value="">Todas las cajas</option>
-              {filters.transmissions.map((transmission) => (
-                <option key={transmission} value={transmission}>
-                  {transmission}
-                </option>
-              ))}
+              <option value="">
+                Todas las cajas
+              </option>
+
+              {filters.transmissions.map(
+                (transmission) => (
+                  <option
+                    key={transmission}
+                    value={transmission}
+                    className="bg-[#071224]"
+                  >
+                    {transmission}
+                  </option>
+                ),
+              )}
             </select>
 
+            {/* combustible */}
             <select
               value={selectedFuel}
-              onChange={(e) => setSelectedFuel(e.target.value)}
-              className="h-11 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm text-gray-700 outline-none transition focus:border-[#1f4e96] focus:bg-white"
+              onChange={(e) =>
+                setSelectedFuel(e.target.value)
+              }
+              className="
+                h-11
+                w-full
+                rounded-lg
+                border
+                border-white/10
+                bg-[#071224]
+                px-3
+                text-sm
+                text-slate-300
+                outline-none
+                transition
+                hover:border-white/20
+                focus:border-[#3169b7]
+                focus:ring-2
+                focus:ring-[#3169b7]/20
+              "
             >
-              <option value="">Combustible</option>
+              <option value="">
+                Todos los combustibles
+              </option>
+
               {filters.fuels.map((fuel) => (
-                <option key={fuel} value={fuel}>
+                <option
+                  key={fuel}
+                  value={fuel}
+                  className="bg-[#071224]"
+                >
                   {fuel}
                 </option>
               ))}
             </select>
 
+            {/* año desde */}
             <input
               type="number"
               placeholder="Año desde"
               value={yearMin}
               min={1980}
               max={new Date().getFullYear()}
-              onChange={(e) => setYearMin(e.target.value ? Number(e.target.value) : '')}
-              className="h-11 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm text-gray-700 outline-none transition focus:border-[#1f4e96] focus:bg-white"
+              onChange={(e) =>
+                setYearMin(
+                  e.target.value
+                    ? Number(e.target.value)
+                    : '',
+                )
+              }
+              className="
+                h-11
+                w-full
+                rounded-lg
+                border
+                border-white/10
+                bg-[#071224]
+                px-3
+                text-sm
+                text-slate-300
+                outline-none
+                transition
+                placeholder:text-slate-600
+                hover:border-white/20
+                focus:border-[#3169b7]
+                focus:ring-2
+                focus:ring-[#3169b7]/20
+              "
             />
 
+            {/* año hasta */}
             <input
               type="number"
               placeholder="Año hasta"
               value={yearMax}
               min={1980}
               max={new Date().getFullYear()}
-              onChange={(e) => setYearMax(e.target.value ? Number(e.target.value) : '')}
-              className="h-11 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm text-gray-700 outline-none transition focus:border-[#1f4e96] focus:bg-white"
+              onChange={(e) =>
+                setYearMax(
+                  e.target.value
+                    ? Number(e.target.value)
+                    : '',
+                )
+              }
+              className="
+                h-11
+                w-full
+                rounded-lg
+                border
+                border-white/10
+                bg-[#071224]
+                px-3
+                text-sm
+                text-slate-300
+                outline-none
+                transition
+                placeholder:text-slate-600
+                hover:border-white/20
+                focus:border-[#3169b7]
+                focus:ring-2
+                focus:ring-[#3169b7]/20
+              "
             />
+
+            {/* resultado */}
+            <div className="flex h-11 items-center rounded-lg border border-white/10 bg-white/[0.03] px-4 text-sm text-slate-400">
+              <span className="mr-1.5 font-semibold text-white">
+                {total}
+              </span>
+
+              {total === 1
+                ? 'vehículo'
+                : 'vehículos'}
+            </div>
           </div>
         </div>
 
-        <div className="mb-6 flex items-center justify-between">
-          <p className="text-sm text-gray-600">
-            <span className="font-bold text-gray-900">{total}</span>{' '}
-            {total === 1 ? 'vehículo encontrado' : 'vehículos encontrados'}
-          </p>
-        </div>
+        {/* ==================================
+            ERROR
+        ================================== */}
 
         {error && (
-          <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700">
+          <div className="mb-6 rounded-xl border border-red-400/20 bg-red-500/10 px-5 py-4 text-sm text-red-300">
             {error}
           </div>
         )}
 
+        {/* ==================================
+            LOADING
+        ================================== */}
+
         {loading ? (
-          <div className="grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="h-[430px] animate-pulse rounded-3xl border border-gray-200 bg-white" />
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+
+            {Array.from({
+              length: ITEMS_PER_PAGE,
+            }).map((_, i) => (
+              <div
+                key={i}
+                className="animate-pulse overflow-hidden rounded-xl border border-white/10 bg-[#0c192d]"
+              >
+                <div className="aspect-[4/3] bg-white/5" />
+
+                <div className="space-y-3 p-4">
+                  <div className="h-2.5 w-1/4 rounded bg-white/10" />
+                  <div className="h-4 w-2/3 rounded bg-white/10" />
+                  <div className="h-3 w-1/2 rounded bg-white/10" />
+                  <div className="h-10 rounded bg-white/10" />
+                </div>
+              </div>
             ))}
           </div>
         ) : vehicles.length > 0 ? (
-          <div className="grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3">
+
+          /* ==================================
+             VEHÍCULOS
+          ================================== */
+
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+
             {vehicles.map((vehicle) => (
               <article
                 key={vehicle.id}
-                onClick={() => router.push(`/vehiculos/${vehicle.slug}`)}
-                className="group cursor-pointer overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                onClick={() =>
+                  router.push(
+                    `/vehiculos/${vehicle.slug}`,
+                  )
+                }
+                className="
+                  group
+                  cursor-pointer
+                  overflow-hidden
+                  rounded-xl
+                  border
+                  border-white/10
+                  bg-[#0c192d]
+                  transition-all
+                  duration-300
+                  hover:-translate-y-1
+                  hover:border-[#3169b7]/70
+                  hover:shadow-[0_18px_45px_-18px_rgba(0,0,0,0.8)]
+                "
               >
-                <div className="relative h-60 w-full overflow-hidden">
+
+                {/* imagen */}
+                <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#0a1526]">
+
                   <Image
-                    src={vehicle.images?.[0] || FALLBACK_IMG}
+                    src={
+                      vehicle.images?.[0] ||
+                      FALLBACK_IMG
+                    }
                     alt={`${vehicle.brand} ${vehicle.model}`}
                     fill
-                    className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    className="object-cover object-center transition-transform duration-700 group-hover:scale-[1.03]"
+                    sizes="
+                      (max-width: 640px) 100vw,
+                      (max-width: 1024px) 50vw,
+                      (max-width: 1280px) 33vw,
+                      25vw
+                    "
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-                  <span className="absolute bottom-4 right-4 rounded-lg bg-black/60 px-3 py-1.5 text-sm font-semibold text-white backdrop-blur">
+
+                  {/* degradado */}
+                  <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/35 to-transparent" />
+
+                  {/* año */}
+                  <span className="absolute left-3 top-3 rounded-md border border-white/20 bg-[#071224]/90 px-2.5 py-1 text-[10px] font-semibold text-white shadow-sm backdrop-blur">
                     {vehicle.year}
                   </span>
                 </div>
 
-                <div className="p-5">
-                  <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#1f4e96]">{vehicle.brand}</p>
-                  <h2 className="mt-1 text-2xl font-bold text-gray-900">{vehicle.model}</h2>
-                  <p className="mt-1 text-sm text-gray-500">{vehicle.version}</p>
+                {/* info */}
+                <div className="p-4">
 
-                  <div className="mt-5 grid grid-cols-3 gap-2 border-y border-gray-100 py-4">
-                    <div className="flex flex-col items-center gap-1 text-center">
-                      <Gauge size={18} className="text-[#1f4e96]" />
-                      <span className="text-xs text-gray-400">Km</span>
-                      <span className="text-xs font-semibold text-gray-700">
-                        {vehicle.mileage?.toLocaleString('es-AR')}
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-blue-300">
+                    {vehicle.brand}
+                  </p>
+
+                  <h2 className="mt-1 truncate text-lg font-semibold text-white">
+                    {vehicle.model}
+                  </h2>
+
+                  <p className="mt-0.5 truncate text-xs text-slate-500">
+                    {vehicle.version}
+                  </p>
+
+                  {/* características */}
+                  <div className="mt-4 grid grid-cols-3 border-y border-white/10 py-3">
+
+                    <div className="flex items-center gap-1.5 border-r border-white/10 pr-2 text-[10px] text-slate-400">
+                      <Gauge
+                        size={13}
+                        className="shrink-0 text-blue-300"
+                      />
+
+                      <span className="truncate">
+                        {vehicle.mileage?.toLocaleString(
+                          'es-AR',
+                        )}{' '}
+                        km
                       </span>
                     </div>
-                    <div className="flex flex-col items-center gap-1 text-center">
-                      <Settings2 size={18} className="text-[#1f4e96]" />
-                      <span className="text-xs text-gray-400">Caja</span>
-                      <span className="max-w-[90px] truncate text-xs font-semibold text-gray-700">
+
+                    <div className="flex items-center gap-1.5 border-r border-white/10 px-2 text-[10px] text-slate-400">
+                      <Settings2
+                        size={13}
+                        className="shrink-0 text-blue-300"
+                      />
+
+                      <span className="truncate">
                         {vehicle.transmission}
                       </span>
                     </div>
-                    <div className="flex flex-col items-center gap-1 text-center">
-                      <Fuel size={18} className="text-[#1f4e96]" />
-                      <span className="text-xs text-gray-400">Combustible</span>
-                      <span className="text-xs font-semibold text-gray-700">{vehicle.fuel}</span>
+
+                    <div className="flex items-center gap-1.5 pl-2 text-[10px] text-slate-400">
+                      <Fuel
+                        size={13}
+                        className="shrink-0 text-blue-300"
+                      />
+
+                      <span className="truncate">
+                        {vehicle.fuel}
+                      </span>
                     </div>
                   </div>
 
-                  <div className="mt-5">
-                    <p className="text-xs uppercase tracking-wide text-gray-400">Precio</p>
-                    <p className="mt-1 text-2xl font-extrabold text-[#071224]">
-                      {formatPrice(vehicle.price, vehicle.currency)}
+                  {/* precio */}
+                  <div className="mt-4">
+                    <p className="text-[10px] uppercase tracking-wider text-slate-500">
+                      Precio
+                    </p>
+
+                    <p className="mt-0.5 text-lg font-bold text-white">
+                      {formatPrice(
+                        vehicle.price,
+                        vehicle.currency,
+                      )}
                     </p>
                   </div>
 
+                  {/* botón */}
                   <button
                     type="button"
-                    className="mt-5 w-full rounded-xl bg-[#071224] px-4 py-3 text-sm font-semibold text-white transition group-hover:bg-[#1f4e96]"
+                    onClick={(e) => {
+                      e.stopPropagation();
+
+                      router.push(
+                        `/vehiculos/${vehicle.slug}`,
+                      );
+                    }}
+                    className="
+                      mt-4
+                      flex
+                      h-10
+                      w-full
+                      items-center
+                      justify-center
+                      gap-2
+                      rounded-lg
+                      bg-[#1f4e96]
+                      text-xs
+                      font-semibold
+                      text-white
+                      transition
+                      hover:bg-[#295eaa]
+                    "
                   >
                     Ver vehículo
+
+                    <ArrowRight
+                      size={14}
+                      className="transition-transform duration-200 group-hover:translate-x-0.5"
+                    />
                   </button>
                 </div>
               </article>
             ))}
           </div>
         ) : (
-          <div className="rounded-3xl border border-gray-200 bg-white px-6 py-16 text-center shadow-sm">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-gray-100">
-              <Search size={25} className="text-gray-400" />
+
+          /* ==================================
+             SIN RESULTADOS
+          ================================== */
+
+          <div className="rounded-2xl border border-white/10 bg-[#0c192d] px-6 py-20 text-center">
+
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-blue-400/10">
+              <Search
+                size={23}
+                className="text-blue-300"
+              />
             </div>
-            <h3 className="mt-4 text-xl font-bold text-gray-900">No encontramos vehículos</h3>
-            <p className="mx-auto mt-2 max-w-md text-sm text-gray-500">
-              Probá modificando alguno de los filtros o limpiándolos para ver todo el catálogo.
+
+            <h3 className="mt-5 text-lg font-semibold text-white">
+              No encontramos vehículos
+            </h3>
+
+            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">
+              Probá modificando alguno de los filtros
+              para encontrar otras unidades disponibles.
             </p>
-            <button
-              type="button"
-              onClick={clearFilters}
-              className="mt-5 rounded-xl bg-[#071224] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#1f4e96]"
-            >
-              Limpiar filtros
-            </button>
+
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="mt-6 rounded-lg bg-[#1f4e96] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#295eaa]"
+              >
+                Limpiar filtros
+              </button>
+            )}
           </div>
         )}
 
-        {pageCount > 1 && (
-          <nav className="mt-12 flex items-center justify-center gap-2">
-            <button
-              type="button"
-              disabled={page === 1}
-              onClick={() => setPage((previous) => Math.max(previous - 1, 1))}
-              className="flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 bg-white text-[#071224] transition hover:border-[#1f4e96] hover:text-[#1f4e96] disabled:cursor-not-allowed disabled:opacity-30"
-            >
-              <ChevronLeft size={19} />
-            </button>
+        {/* ==================================
+            PAGINACIÓN
+        ================================== */}
 
-            {Array.from({ length: pageCount }, (_, index) => index + 1).map((pageNumber) => (
+        {!loading &&
+          vehicles.length > 0 &&
+          pageCount > 1 && (
+            <nav
+              className="mt-12 flex items-center justify-center gap-2"
+              aria-label="Paginación de vehículos"
+            >
+
+              {/* anterior */}
               <button
-                key={pageNumber}
                 type="button"
-                onClick={() => setPage(pageNumber)}
-                className={`h-10 min-w-10 rounded-xl px-3 text-sm font-semibold transition ${
-                  page === pageNumber
-                    ? 'bg-[#1f4e96] text-white shadow-md'
-                    : 'border border-gray-200 bg-white text-gray-700 hover:border-[#1f4e96] hover:text-[#1f4e96]'
-                }`}
+                aria-label="Página anterior"
+                disabled={page === 1}
+                onClick={() =>
+                  changePage(page - 1)
+                }
+                className="
+                  flex
+                  h-10
+                  w-10
+                  items-center
+                  justify-center
+                  rounded-lg
+                  border
+                  border-white/10
+                  bg-[#0c192d]
+                  text-slate-300
+                  transition
+                  hover:border-[#3169b7]
+                  hover:text-white
+                  disabled:cursor-not-allowed
+                  disabled:opacity-30
+                "
               >
-                {pageNumber}
+                <ChevronLeft size={18} />
               </button>
-            ))}
 
-            <button
-              type="button"
-              disabled={page === pageCount}
-              onClick={() => setPage((previous) => Math.min(previous + 1, pageCount))}
-              className="flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 bg-white text-[#071224] transition hover:border-[#1f4e96] hover:text-[#1f4e96] disabled:cursor-not-allowed disabled:opacity-30"
-            >
-              <ChevronRight size={19} />
-            </button>
-          </nav>
-        )}
+              {/* números */}
+              {Array.from(
+                { length: pageCount },
+                (_, index) => index + 1,
+              ).map((pageNumber) => (
+                <button
+                  key={pageNumber}
+                  type="button"
+                  aria-label={`Ir a página ${pageNumber}`}
+                  aria-current={
+                    page === pageNumber
+                      ? 'page'
+                      : undefined
+                  }
+                  onClick={() =>
+                    changePage(pageNumber)
+                  }
+                  className={`
+                    h-10
+                    min-w-10
+                    rounded-lg
+                    px-3
+                    text-sm
+                    font-semibold
+                    transition
+                    ${
+                      page === pageNumber
+                        ? 'bg-[#1f4e96] text-white shadow-lg shadow-blue-950/30'
+                        : 'border border-white/10 bg-[#0c192d] text-slate-400 hover:border-[#3169b7] hover:text-white'
+                    }
+                  `}
+                >
+                  {pageNumber}
+                </button>
+              ))}
+
+              {/* siguiente */}
+              <button
+                type="button"
+                aria-label="Página siguiente"
+                disabled={page === pageCount}
+                onClick={() =>
+                  changePage(page + 1)
+                }
+                className="
+                  flex
+                  h-10
+                  w-10
+                  items-center
+                  justify-center
+                  rounded-lg
+                  border
+                  border-white/10
+                  bg-[#0c192d]
+                  text-slate-300
+                  transition
+                  hover:border-[#3169b7]
+                  hover:text-white
+                  disabled:cursor-not-allowed
+                  disabled:opacity-30
+                "
+              >
+                <ChevronRight size={18} />
+              </button>
+            </nav>
+          )}
       </section>
     </main>
   );

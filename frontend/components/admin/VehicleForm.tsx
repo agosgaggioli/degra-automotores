@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { X, ImagePlus } from 'lucide-react';
 import { Vehicle, deleteVehicleImage } from '../../lib/api';
@@ -67,8 +67,26 @@ export default function VehicleForm({
 }: Props) {
   const [values, setValues] = useState<VehicleFormValues>(initialValues);
   const [newImages, setNewImages] = useState<File[]>([]);
+  const [newImagePreviews, setNewImagePreviews] = useState<string[]>([]);
   const [images, setImages] = useState(existingImages);
   const [removingId, setRemovingId] = useState<string | null>(null);
+
+  // Cada vez que se usa el selector de archivos, cambiamos esta "key" para que
+  // React vuelva a crear el <input type="file"> desde cero. Esto evita un bug
+  // conocido de los navegadores donde, al reutilizar el mismo input, la segunda
+  // (o siguiente) selección de imágenes no dispara el evento onChange y las
+  // fotos nuevas no se agregan.
+  const [fileInputKey, setFileInputKey] = useState(0);
+
+  // Genera (y limpia) una URL de previsualización por cada foto nueva,
+  // para que se vea la imagen real en vez del nombre del archivo.
+  useEffect(() => {
+    const urls = newImages.map((file) => URL.createObjectURL(file));
+    setNewImagePreviews(urls);
+    return () => {
+      urls.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [newImages]);
 
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -81,9 +99,13 @@ export default function VehicleForm({
   }
 
   function handleFiles(e: React.ChangeEvent<HTMLInputElement>) {
-    if (!e.target.files) return;
-    setNewImages((prev) => [...prev, ...Array.from(e.target.files as FileList)]);
-    e.target.value = '';
+    if (!e.target.files || e.target.files.length === 0) return;
+    const selected = Array.from(e.target.files);
+    setNewImages((prev) => [...prev, ...selected]);
+    // Forzamos que el input se recree (ver comentario en fileInputKey) para
+    // que la próxima vez que se abra el selector de archivos funcione bien,
+    // incluso si es la segunda, tercera o décima vez.
+    setFileInputKey((k) => k + 1);
   }
 
   function removeNewImage(idx: number) {
@@ -241,14 +263,31 @@ export default function VehicleForm({
           <ImagePlus size={24} className="text-[#1f4e96]" />
           <span className="mt-2 text-sm font-semibold text-[#071224]">Agregar imágenes</span>
           <span className="text-xs text-gray-500">JPG, PNG o WEBP</span>
-          <input type="file" multiple accept="image/jpeg,image/png,image/webp" onChange={handleFiles} className="hidden" />
+          <input
+            key={fileInputKey}
+            type="file"
+            multiple
+            accept="image/jpeg,image/png,image/webp"
+            onChange={handleFiles}
+            className="hidden"
+          />
         </label>
 
         {newImages.length > 0 && (
           <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-6">
             {newImages.map((file, idx) => (
-              <div key={idx} className="relative flex h-24 items-center justify-center overflow-hidden rounded-xl border border-gray-200 bg-gray-100 p-2">
-                <p className="line-clamp-3 break-all text-center text-[10px] font-medium text-gray-600">{file.name}</p>
+              <div key={idx} className="relative h-24 overflow-hidden rounded-xl border border-gray-200 bg-gray-100">
+                {newImagePreviews[idx] && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={newImagePreviews[idx]}
+                    alt={file.name}
+                    className="h-full w-full object-cover"
+                  />
+                )}
+                <span className="absolute bottom-0 left-0 right-0 truncate bg-black/60 px-1.5 py-0.5 text-[9px] font-medium text-white">
+                  Nueva
+                </span>
                 <button
                   type="button"
                   onClick={() => removeNewImage(idx)}

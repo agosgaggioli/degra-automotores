@@ -130,6 +130,7 @@ export async function fetchVehicles(params: {
   fuel?: string;
   yearMin?: number | '';
   yearMax?: number | '';
+  featured?: boolean;
   page?: number;
   pageSize?: number;
 } = {}): Promise<Paginated<Vehicle>> {
@@ -142,6 +143,10 @@ export async function fetchVehicles(params: {
 
   const res = await fetch(`${API_URL}/vehicles?${qs.toString()}`, { cache: 'no-store' });
   return handleResponse<Paginated<Vehicle>>(res);
+}
+
+export async function fetchFeaturedVehicles(pageSize = 3): Promise<Paginated<Vehicle>> {
+  return fetchVehicles({ featured: true, pageSize });
 }
 
 export async function fetchVehicleFilters(): Promise<VehicleFilters> {

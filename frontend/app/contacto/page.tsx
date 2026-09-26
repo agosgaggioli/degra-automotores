@@ -136,7 +136,7 @@ export default function ContactoPage() {
   /*
     CAMBIAR POR LOS DATOS REALES DE DR
   */
-  const whatsappNumber = '5493512345678';
+  const whatsappNumber = '3463406181';
 
   const whatsappMessage = encodeURIComponent(
     'Hola, quisiera realizar una consulta.'

@@ -19,7 +19,10 @@ const vehicleSchema = z.object({
   license_plate: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
   status: z.enum(['published', 'draft', 'sold']).default('published'),
-  featured: z.coerce.boolean().default(false),
+    featured: z
+    .union([z.boolean(), z.string()])
+    .transform((v) => v === true || v === 'true')
+    .default(false),
 });
 
 async function buildUniqueSlug(brand, model, version, year, excludeId = null) {
@@ -56,6 +59,7 @@ async function listPublic(req, res, next) {
       fuel = '',
       yearMin,
       yearMax,
+      featured,
       page = '1',
       pageSize = '12',
     } = req.query;
@@ -76,6 +80,7 @@ async function listPublic(req, res, next) {
     if (fuel) query = query.eq('fuel', fuel);
     if (yearMin) query = query.gte('year', Number(yearMin));
     if (yearMax) query = query.lte('year', Number(yearMax));
+    if (featured === 'true') query = query.eq('featured', true);
     if (search) {
       query = query.or(
         `brand.ilike.%${search}%,model.ilike.%${search}%,version.ilike.%${search}%,color.ilike.%${search}%`

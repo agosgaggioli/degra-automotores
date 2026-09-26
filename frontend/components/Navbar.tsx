@@ -308,7 +308,7 @@ export default function Navbar() {
             {/* WHATSAPP */}
 
             <a
-              href="https://wa.me/5493512345678"
+              href="https://wa.me/3463406181"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Contactar por WhatsApp"

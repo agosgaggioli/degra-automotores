@@ -1,7 +1,15 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import React, {
+  useEffect,
+  useState,
+} from 'react';
+
+import {
+  useParams,
+  useRouter,
+} from 'next/navigation';
+
 import Image from 'next/image';
 
 import {
@@ -16,277 +24,999 @@ import {
   ArrowLeft,
 } from 'lucide-react';
 
-import { fetchVehicleBySlug, submitContact, Vehicle } from '../../../lib/api';
+import {
+  fetchVehicleBySlug,
+  submitContact,
+  Vehicle,
+} from '../../../lib/api';
 
-const FALLBACK_IMG = '/images/vehicles/onix.jpeg';
+const FALLBACK_IMG =
+  '/images/vehicles/onix.jpeg';
 
 export default function VehicleDetailPage() {
-  const params = useParams<{ slug: string }>();
+  const params =
+    useParams<{ slug: string }>();
+
   const router = useRouter();
-  const slug = params?.slug as string;
 
-  const [vehicle, setVehicle] = useState<Vehicle | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [activeImage, setActiveImage] = useState(0);
+  const slug =
+    params?.slug as string;
 
-  const [formData, setFormData] = useState({ name: '', phone: '', email: '', message: '' });
-  const [sending, setSending] = useState(false);
-  const [sent, setSent] = useState(false);
-  const [formError, setFormError] = useState('');
+  const [vehicle, setVehicle] =
+    useState<Vehicle | null>(null);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [error, setError] =
+    useState('');
+
+  const [
+    activeImage,
+    setActiveImage,
+  ] = useState(0);
+
+  const [formData, setFormData] =
+    useState({
+      name: '',
+      phone: '',
+      email: '',
+      message: '',
+    });
+
+  const [sending, setSending] =
+    useState(false);
+
+  const [sent, setSent] =
+    useState(false);
+
+  const [
+    formError,
+    setFormError,
+  ] = useState('');
+
+  /* =========================================
+     CARGAR VEHÍCULO
+  ========================================= */
 
   useEffect(() => {
     if (!slug) return;
+
     setLoading(true);
+
     fetchVehicleBySlug(slug)
-      .then((res) => setVehicle(res.data))
-      .catch((err) => setError(err.message || 'No pudimos cargar este vehículo.'))
-      .finally(() => setLoading(false));
+      .then((res) =>
+        setVehicle(res.data),
+      )
+      .catch((err) =>
+        setError(
+          err.message ||
+            'No pudimos cargar este vehículo.',
+        ),
+      )
+      .finally(() =>
+        setLoading(false),
+      );
   }, [slug]);
+
+  /* =========================================
+     MENSAJE PREDETERMINADO
+  ========================================= */
 
   useEffect(() => {
     if (vehicle) {
       setFormData((prev) => ({
         ...prev,
-        message: `Hola, me interesa el ${vehicle.brand} ${vehicle.model} ${vehicle.version || ''} ${vehicle.year}. ¿Sigue disponible?`,
+        message: `Hola, me interesa el ${vehicle.brand} ${vehicle.model} ${
+          vehicle.version || ''
+        } ${vehicle.year}. ¿Sigue disponible?`,
       }));
     }
   }, [vehicle]);
 
-  const formatPrice = (price: number, currency: string) =>
-    new Intl.NumberFormat('es-AR', { style: 'currency', currency: currency || 'ARS', maximumFractionDigits: 0 }).format(
-      price
-    );
+  /* =========================================
+     PRECIO
+  ========================================= */
 
-  async function handleSubmit(e: React.FormEvent) {
+  const formatPrice = (
+    price: number,
+    currency: string,
+  ) =>
+    new Intl.NumberFormat(
+      'es-AR',
+      {
+        style: 'currency',
+        currency:
+          currency || 'ARS',
+        maximumFractionDigits: 0,
+      },
+    ).format(price);
+
+  /* =========================================
+     CONSULTA
+  ========================================= */
+
+  async function handleSubmit(
+    e: React.FormEvent,
+  ) {
     e.preventDefault();
+
     setFormError('');
 
-    if (!formData.name.trim() || !formData.phone.trim() || !formData.email.trim()) {
-      setFormError('Completá nombre, teléfono y email para poder contactarte.');
+    if (
+      !formData.name.trim() ||
+      !formData.phone.trim() ||
+      !formData.email.trim()
+    ) {
+      setFormError(
+        'Completá nombre, teléfono y email para poder contactarte.',
+      );
+
       return;
     }
 
     setSending(true);
+
     try {
       await submitContact({
         name: formData.name,
         phone: formData.phone,
         email: formData.email,
         subject: 'vehiculo',
-        message: formData.message,
+        message:
+          formData.message,
       });
+
       setSent(true);
     } catch (err: any) {
-      setFormError(err.message || 'No pudimos enviar tu consulta. Probá de nuevo.');
+      setFormError(
+        err.message ||
+          'No pudimos enviar tu consulta. Probá de nuevo.',
+      );
     } finally {
       setSending(false);
     }
   }
 
+  /* =========================================
+     LOADING
+  ========================================= */
+
   if (loading) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[#071224] text-white">
-        Cargando vehículo...
+
+        <div className="text-center">
+
+          <div className="mx-auto h-7 w-7 animate-spin rounded-full border-2 border-white/10 border-t-blue-400" />
+
+          <p className="mt-3 text-xs text-slate-400">
+            Cargando vehículo...
+          </p>
+
+        </div>
+
       </main>
     );
   }
+
+  /* =========================================
+     ERROR
+  ========================================= */
 
   if (error || !vehicle) {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[#071224] px-4 text-center text-white">
-        <p className="text-lg font-semibold">{error || 'Vehículo no encontrado.'}</p>
+
+        <p className="text-base font-semibold">
+          {error ||
+            'Vehículo no encontrado.'}
+        </p>
+
         <button
           type="button"
-          onClick={() => router.push('/vehiculos')}
-          className="rounded-xl bg-[#1f4e96] px-6 py-3 font-semibold text-white transition hover:bg-[#163b71]"
+          onClick={() =>
+            router.push(
+              '/vehiculos',
+            )
+          }
+          className="h-9 rounded-lg bg-[#1f4e96] px-4 text-xs font-semibold text-white transition hover:bg-[#295eaa]"
         >
           Volver al catálogo
         </button>
+
       </main>
     );
   }
 
-  const images = vehicle.images?.length ? vehicle.images : [FALLBACK_IMG];
+  const images =
+    vehicle.images?.length
+      ? vehicle.images
+      : [FALLBACK_IMG];
 
   return (
-    <main className="min-h-screen bg-[#f3f4f6]">
-      <section className="bg-[#071224] pb-8 pt-8 text-white">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-[#071224] text-white">
+
+      {/* =====================================
+          CABECERA
+      ===================================== */}
+
+      <section className="relative overflow-hidden pt-24">
+
+        <div className="pointer-events-none absolute -right-52 -top-52 h-[500px] w-[500px] rounded-full bg-[#1f4e96]/15 blur-[130px]" />
+
+        <div className="relative mx-auto max-w-7xl px-4 pt-5 sm:px-6 lg:px-8">
+
           <button
             type="button"
-            onClick={() => router.push('/vehiculos')}
-            className="flex items-center gap-2 text-sm font-semibold text-blue-300 transition hover:text-white"
+            onClick={() =>
+              router.push(
+                '/vehiculos',
+              )
+            }
+            className="
+              inline-flex
+              h-8
+              items-center
+              gap-1.5
+              rounded-lg
+              border
+              border-white/10
+              bg-white/[0.03]
+              px-3
+              text-[11px]
+              font-semibold
+              text-slate-400
+              transition
+              hover:border-[#3169b7]/60
+              hover:text-white
+            "
           >
-            <ArrowLeft size={16} />
+            <ArrowLeft
+              size={13}
+            />
+
             Volver al catálogo
           </button>
+
         </div>
+
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-        <div className="grid gap-10 lg:grid-cols-[1.3fr_1fr]">
-          {/* GALERÍA */}
-          <div>
-            <div className="relative aspect-[4/5] w-full max-h-[560px] overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm">
-              <Image
-                src={images[activeImage]}
-                alt={`${vehicle.brand} ${vehicle.model}`}
-                fill
-                className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 60vw"
-              />
+      {/* =====================================
+          CONTENIDO
+      ===================================== */}
 
-              {images.length > 1 && (
-                <>
+      <section className="mx-auto max-w-7xl px-4 pb-20 pt-5 sm:px-6 lg:px-8">
+
+        <div className="grid items-start gap-7 lg:grid-cols-[minmax(0,0.95fr)_minmax(340px,0.7fr)]">
+
+          {/* =================================
+              COLUMNA IZQUIERDA
+          ================================= */}
+
+          <div className="min-w-0">
+
+            {/* ===============================
+                GALERÍA PRINCIPAL 4:5
+            =============================== */}
+
+            <div className="mx-auto w-full max-w-[540px] lg:mx-0">
+
+              <div className="relative aspect-[4/5] w-full overflow-hidden rounded-xl border border-white/10 bg-[#0c192d]">
+
+                <Image
+                  src={
+                    images[
+                      activeImage
+                    ]
+                  }
+                  alt={`${vehicle.brand} ${vehicle.model}`}
+                  fill
+                  priority
+                  className="object-cover object-center"
+                  sizes="
+                    (max-width: 640px) 100vw,
+                    (max-width: 1024px) 70vw,
+                    540px
+                  "
+                />
+
+                {/* DEGRADADO */}
+
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/40 to-transparent" />
+
+                {/* FLECHA IZQUIERDA */}
+
+                {images.length >
+                  1 && (
+
                   <button
                     type="button"
-                    onClick={() => setActiveImage((i) => (i - 1 + images.length) % images.length)}
-                    className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-[#071224] shadow transition hover:bg-white"
+                    aria-label="Imagen anterior"
+                    onClick={() =>
+                      setActiveImage(
+                        (i) =>
+                          (i -
+                            1 +
+                            images.length) %
+                          images.length,
+                      )
+                    }
+                    className="
+                      absolute
+                      left-3
+                      top-1/2
+                      flex
+                      h-8
+                      w-8
+                      -translate-y-1/2
+                      items-center
+                      justify-center
+                      rounded-full
+                      border
+                      border-white/15
+                      bg-[#071224]/80
+                      text-white
+                      backdrop-blur
+                      transition
+                      hover:bg-[#071224]
+                    "
                   >
-                    <ChevronLeft size={20} />
+                    <ChevronLeft
+                      size={16}
+                    />
                   </button>
+
+                )}
+
+                {/* FLECHA DERECHA */}
+
+                {images.length >
+                  1 && (
+
                   <button
                     type="button"
-                    onClick={() => setActiveImage((i) => (i + 1) % images.length)}
-                    className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-[#071224] shadow transition hover:bg-white"
+                    aria-label="Imagen siguiente"
+                    onClick={() =>
+                      setActiveImage(
+                        (i) =>
+                          (i + 1) %
+                          images.length,
+                      )
+                    }
+                    className="
+                      absolute
+                      right-3
+                      top-1/2
+                      flex
+                      h-8
+                      w-8
+                      -translate-y-1/2
+                      items-center
+                      justify-center
+                      rounded-full
+                      border
+                      border-white/15
+                      bg-[#071224]/80
+                      text-white
+                      backdrop-blur
+                      transition
+                      hover:bg-[#071224]
+                    "
                   >
-                    <ChevronRight size={20} />
+                    <ChevronRight
+                      size={16}
+                    />
                   </button>
-                </>
+
+                )}
+
+                {/* AÑO */}
+
+                <span className="absolute bottom-3 right-3 rounded-md border border-white/15 bg-[#071224]/85 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur">
+                  {vehicle.year}
+                </span>
+
+                {/* CONTADOR */}
+
+                {images.length >
+                  1 && (
+
+                  <span className="absolute bottom-3 left-3 rounded-md border border-white/15 bg-[#071224]/85 px-2 py-1 text-[9px] font-medium text-slate-300 backdrop-blur">
+                    {activeImage +
+                      1}{' '}
+                    /{' '}
+                    {
+                      images.length
+                    }
+                  </span>
+
+                )}
+
+              </div>
+
+              {/* ===============================
+                  MINIATURAS 4:5
+              =============================== */}
+
+              {images.length >
+                1 && (
+
+                <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+
+                  {images.map(
+                    (
+                      img,
+                      idx,
+                    ) => (
+
+                      <button
+                        key={
+                          img +
+                          idx
+                        }
+                        type="button"
+                        onClick={() =>
+                          setActiveImage(
+                            idx,
+                          )
+                        }
+                        aria-label={`Ver imagen ${
+                          idx +
+                          1
+                        }`}
+                        className={`
+                          relative
+                          aspect-[4/5]
+                          w-[62px]
+                          shrink-0
+                          overflow-hidden
+                          rounded-lg
+                          border
+                          transition
+                          ${
+                            activeImage ===
+                            idx
+                              ? 'border-[#3169b7] ring-1 ring-[#3169b7]/40'
+                              : 'border-white/10 opacity-60 hover:border-white/30 hover:opacity-100'
+                          }
+                        `}
+                      >
+
+                        <Image
+                          src={
+                            img
+                          }
+                          alt=""
+                          fill
+                          className="object-cover object-center"
+                          sizes="62px"
+                        />
+
+                      </button>
+
+                    ),
+                  )}
+
+                </div>
+
               )}
 
-              <span className="absolute bottom-4 right-4 rounded-lg bg-black/60 px-3 py-1.5 text-sm font-semibold text-white backdrop-blur">
-                {vehicle.year}
-              </span>
             </div>
 
-            {images.length > 1 && (
-              <div className="mt-3 grid grid-cols-5 gap-3">
-                {images.map((img, idx) => (
-                  <button
-                    key={img + idx}
-                    type="button"
-                    onClick={() => setActiveImage(idx)}
-                    className={`relative h-16 overflow-hidden rounded-xl border-2 transition ${
-                      activeImage === idx ? 'border-[#1f4e96]' : 'border-transparent opacity-70 hover:opacity-100'
-                    }`}
-                  >
-                    <Image src={img} alt="" fill className="object-cover" sizes="100px" />
-                  </button>
-                ))}
-              </div>
-            )}
+            {/* =================================
+                CARACTERÍSTICAS
+            ================================= */}
 
-            {/* CARACTERÍSTICAS */}
-            <div className="mt-8 rounded-3xl border border-gray-200 bg-white p-6 shadow-sm md:p-8">
-              <h2 className="text-xl font-bold text-[#071224]">Características</h2>
-              <div className="mt-6 grid grid-cols-2 gap-5 sm:grid-cols-4">
-                <Feature icon={<CalendarDays size={20} />} label="Año" value={String(vehicle.year)} />
-                <Feature icon={<Gauge size={20} />} label="Kilometraje" value={`${vehicle.mileage?.toLocaleString('es-AR')} km`} />
-                <Feature icon={<Settings2 size={20} />} label="Transmisión" value={vehicle.transmission || '-'} />
-                <Feature icon={<Fuel size={20} />} label="Combustible" value={vehicle.fuel || '-'} />
-                <Feature icon={<Palette size={20} />} label="Color" value={vehicle.color || '-'} />
+            <div className="mt-5 rounded-xl border border-white/10 bg-[#0c192d] p-4">
+
+              <div className="flex items-center justify-between">
+
+                <div>
+
+                  <p className="text-[9px] font-semibold uppercase tracking-[0.15em] text-blue-300">
+                    Ficha técnica
+                  </p>
+
+                  <h2 className="mt-1 text-base font-semibold text-white">
+                    Características
+                  </h2>
+
+                </div>
+
               </div>
+
+              <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+
+                <Feature
+                  icon={
+                    <CalendarDays
+                      size={15}
+                    />
+                  }
+                  label="Año"
+                  value={String(
+                    vehicle.year,
+                  )}
+                />
+
+                <Feature
+                  icon={
+                    <Gauge
+                      size={15}
+                    />
+                  }
+                  label="Kilometraje"
+                  value={`${vehicle.mileage?.toLocaleString(
+                    'es-AR',
+                  )} km`}
+                />
+
+                <Feature
+                  icon={
+                    <Settings2
+                      size={15}
+                    />
+                  }
+                  label="Transmisión"
+                  value={
+                    vehicle.transmission ||
+                    '-'
+                  }
+                />
+
+                <Feature
+                  icon={
+                    <Fuel
+                      size={15}
+                    />
+                  }
+                  label="Combustible"
+                  value={
+                    vehicle.fuel ||
+                    '-'
+                  }
+                />
+
+                <Feature
+                  icon={
+                    <Palette
+                      size={15}
+                    />
+                  }
+                  label="Color"
+                  value={
+                    vehicle.color ||
+                    '-'
+                  }
+                />
+
+              </div>
+
+              {/* DESCRIPCIÓN */}
 
               {vehicle.description && (
-                <div className="mt-6 border-t border-gray-100 pt-6">
-                  <h3 className="text-sm font-bold uppercase tracking-wide text-gray-400">Descripción</h3>
-                  <p className="mt-2 whitespace-pre-line text-gray-700">{vehicle.description}</p>
+
+                <div className="mt-4 border-t border-white/10 pt-4">
+
+                  <p className="text-[9px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                    Descripción
+                  </p>
+
+                  <p className="mt-2 whitespace-pre-line text-xs leading-5 text-slate-300">
+                    {
+                      vehicle.description
+                    }
+                  </p>
+
                 </div>
+
               )}
+
             </div>
+
           </div>
 
-          {/* FICHA + CONTACTO */}
-          <div className="space-y-6">
-            <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm md:p-8">
-              <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#1f4e96]">{vehicle.brand}</p>
-              <h1 className="mt-1 text-3xl font-bold text-[#071224]">{vehicle.model}</h1>
-              <p className="mt-1 text-gray-500">{vehicle.version}</p>
+          {/* =================================
+              COLUMNA DERECHA
+          ================================= */}
 
-              <p className="mt-6 text-xs uppercase tracking-wide text-gray-400">Precio</p>
-              <p className="mt-1 text-3xl font-extrabold text-[#071224]">{formatPrice(vehicle.price, vehicle.currency)}</p>
+          <div className="space-y-4 lg:sticky lg:top-24">
+
+            {/* =================================
+                DATOS VEHÍCULO
+            ================================= */}
+
+            <div className="rounded-xl border border-white/10 bg-[#0c192d] p-5">
+
+              {/* MARCA */}
+
+              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-blue-300">
+                {vehicle.brand}
+              </p>
+
+              {/* MODELO */}
+
+              <h1 className="mt-1 text-2xl font-semibold tracking-tight text-white">
+                {vehicle.model}
+              </h1>
+
+              {/* VERSIÓN */}
+
+              {vehicle.version && (
+
+                <p className="mt-1 text-xs text-slate-400">
+                  {
+                    vehicle.version
+                  }
+                </p>
+
+              )}
+
+              {/* DIVISOR */}
+
+              <div className="my-4 h-px bg-white/10" />
+
+              {/* PRECIO */}
+
+              <p className="text-[9px] font-semibold uppercase tracking-[0.12em] text-slate-500">
+                Precio
+              </p>
+
+              <p className="mt-1 text-2xl font-bold tracking-tight text-white">
+                {formatPrice(
+                  vehicle.price,
+                  vehicle.currency,
+                )}
+              </p>
+
+              {/* WHATSAPP */}
 
               <a
-                href={`https://wa.me/5493512345678?text=${encodeURIComponent(
-                  `Hola! Me interesa el ${vehicle.brand} ${vehicle.model} ${vehicle.version || ''} ${vehicle.year}.`
+                href={`https://wa.me/3463406181?text=${encodeURIComponent(
+                  `Hola! Me interesa el ${vehicle.brand} ${vehicle.model} ${
+                    vehicle.version ||
+                    ''
+                  } ${vehicle.year}.`,
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 px-4 py-3.5 font-semibold text-white transition hover:bg-green-700"
+                className="
+                  mt-5
+                  flex
+                  h-10
+                  w-full
+                  items-center
+                  justify-center
+                  gap-2
+                  rounded-lg
+                  bg-green-600
+                  text-xs
+                  font-semibold
+                  text-white
+                  transition
+                  hover:bg-green-700
+                "
               >
-                <MessageCircle size={19} />
+                <MessageCircle
+                  size={15}
+                />
+
                 Consultar por WhatsApp
               </a>
+
             </div>
 
-            <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm md:p-8">
+            {/* =================================
+                FORMULARIO
+            ================================= */}
+
+            <div className="rounded-xl border border-white/10 bg-[#0c192d] p-5">
+
               {sent ? (
-                <div className="py-6 text-center">
-                  <p className="text-lg font-bold text-[#071224]">¡Consulta enviada!</p>
-                  <p className="mt-2 text-sm text-gray-500">
+
+                <div className="py-5 text-center">
+
+                  <div className="mx-auto flex h-9 w-9 items-center justify-center rounded-full bg-blue-400/10 text-blue-300">
+
+                    <MessageCircle
+                      size={16}
+                    />
+
+                  </div>
+
+                  <p className="mt-3 text-sm font-semibold text-white">
+                    ¡Consulta enviada!
+                  </p>
+
+                  <p className="mx-auto mt-1.5 max-w-xs text-[11px] leading-5 text-slate-400">
                     Nuestro equipo se va a comunicar con vos a la brevedad.
                   </p>
+
                 </div>
+
               ) : (
+
                 <>
-                  <h2 className="text-lg font-bold text-[#071224]">Consultar por este vehículo</h2>
-                  <form onSubmit={handleSubmit} className="mt-4 space-y-3">
+
+                  <p className="text-[9px] font-semibold uppercase tracking-[0.15em] text-blue-300">
+                    Contacto
+                  </p>
+
+                  <h2 className="mt-1 text-base font-semibold text-white">
+                    Consultar por este vehículo
+                  </h2>
+
+                  <p className="mt-1 text-[11px] leading-4 text-slate-500">
+                    Dejanos tus datos y nos comunicamos con vos.
+                  </p>
+
+                  <form
+                    onSubmit={
+                      handleSubmit
+                    }
+                    className="mt-4 space-y-2.5"
+                  >
+
+                    {/* NOMBRE */}
+
                     <input
                       type="text"
                       placeholder="Nombre y apellido"
-                      value={formData.name}
-                      onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))}
-                      className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none focus:border-[#1f4e96] focus:bg-white"
-                    />
-                    <input
-                      type="tel"
-                      placeholder="Teléfono"
-                      value={formData.phone}
-                      onChange={(e) => setFormData((p) => ({ ...p, phone: e.target.value }))}
-                      className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none focus:border-[#1f4e96] focus:bg-white"
-                    />
-                    <input
-                      type="email"
-                      placeholder="Email"
-                      value={formData.email}
-                      onChange={(e) => setFormData((p) => ({ ...p, email: e.target.value }))}
-                      className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none focus:border-[#1f4e96] focus:bg-white"
-                    />
-                    <textarea
-                      rows={4}
-                      value={formData.message}
-                      onChange={(e) => setFormData((p) => ({ ...p, message: e.target.value }))}
-                      className="w-full resize-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none focus:border-[#1f4e96] focus:bg-white"
+                      value={
+                        formData.name
+                      }
+                      onChange={(
+                        e,
+                      ) =>
+                        setFormData(
+                          (p) => ({
+                            ...p,
+                            name: e
+                              .target
+                              .value,
+                          }),
+                        )
+                      }
+                      className="
+                        h-9
+                        w-full
+                        rounded-lg
+                        border
+                        border-white/10
+                        bg-[#071224]
+                        px-3
+                        text-xs
+                        text-white
+                        outline-none
+                        transition
+                        placeholder:text-slate-600
+                        hover:border-white/20
+                        focus:border-[#3169b7]
+                        focus:ring-2
+                        focus:ring-[#3169b7]/20
+                      "
                     />
 
-                    {formError && <p className="text-sm font-medium text-red-600">{formError}</p>}
+                    {/* TELÉFONO + EMAIL */}
+
+                    <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+
+                      <input
+                        type="tel"
+                        placeholder="Teléfono"
+                        value={
+                          formData.phone
+                        }
+                        onChange={(
+                          e,
+                        ) =>
+                          setFormData(
+                            (p) => ({
+                              ...p,
+                              phone:
+                                e
+                                  .target
+                                  .value,
+                            }),
+                          )
+                        }
+                        className="
+                          h-9
+                          w-full
+                          rounded-lg
+                          border
+                          border-white/10
+                          bg-[#071224]
+                          px-3
+                          text-xs
+                          text-white
+                          outline-none
+                          transition
+                          placeholder:text-slate-600
+                          hover:border-white/20
+                          focus:border-[#3169b7]
+                          focus:ring-2
+                          focus:ring-[#3169b7]/20
+                        "
+                      />
+
+                      <input
+                        type="email"
+                        placeholder="Email"
+                        value={
+                          formData.email
+                        }
+                        onChange={(
+                          e,
+                        ) =>
+                          setFormData(
+                            (p) => ({
+                              ...p,
+                              email:
+                                e
+                                  .target
+                                  .value,
+                            }),
+                          )
+                        }
+                        className="
+                          h-9
+                          w-full
+                          rounded-lg
+                          border
+                          border-white/10
+                          bg-[#071224]
+                          px-3
+                          text-xs
+                          text-white
+                          outline-none
+                          transition
+                          placeholder:text-slate-600
+                          hover:border-white/20
+                          focus:border-[#3169b7]
+                          focus:ring-2
+                          focus:ring-[#3169b7]/20
+                        "
+                      />
+
+                    </div>
+
+                    {/* MENSAJE */}
+
+                    <textarea
+                      rows={3}
+                      value={
+                        formData.message
+                      }
+                      onChange={(
+                        e,
+                      ) =>
+                        setFormData(
+                          (p) => ({
+                            ...p,
+                            message:
+                              e.target
+                                .value,
+                          }),
+                        )
+                      }
+                      className="
+                        w-full
+                        resize-none
+                        rounded-lg
+                        border
+                        border-white/10
+                        bg-[#071224]
+                        px-3
+                        py-2.5
+                        text-xs
+                        leading-5
+                        text-white
+                        outline-none
+                        transition
+                        placeholder:text-slate-600
+                        hover:border-white/20
+                        focus:border-[#3169b7]
+                        focus:ring-2
+                        focus:ring-[#3169b7]/20
+                      "
+                    />
+
+                    {/* ERROR */}
+
+                    {formError && (
+
+                      <p className="text-[11px] font-medium text-red-400">
+                        {formError}
+                      </p>
+
+                    )}
+
+                    {/* ENVIAR */}
 
                     <button
                       type="submit"
-                      disabled={sending}
-                      className="w-full rounded-xl bg-[#071224] px-4 py-3 font-semibold text-white transition hover:bg-[#1f4e96] disabled:cursor-not-allowed disabled:opacity-60"
+                      disabled={
+                        sending
+                      }
+                      className="
+                        flex
+                        h-9
+                        w-full
+                        items-center
+                        justify-center
+                        rounded-lg
+                        bg-[#1f4e96]
+                        text-xs
+                        font-semibold
+                        text-white
+                        transition
+                        hover:bg-[#295eaa]
+                        disabled:cursor-not-allowed
+                        disabled:opacity-60
+                      "
                     >
-                      {sending ? 'Enviando...' : 'Enviar consulta'}
+                      {sending
+                        ? 'Enviando...'
+                        : 'Enviar consulta'}
                     </button>
+
                   </form>
+
                 </>
+
               )}
+
             </div>
+
           </div>
+
         </div>
+
       </section>
+
     </main>
   );
 }
 
-function Feature({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+/* =========================================
+   FEATURE
+========================================= */
+
+function Feature({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+}) {
   return (
-    <div className="flex flex-col items-center gap-2 rounded-2xl bg-gray-50 py-4 text-center">
-      <div className="text-[#1f4e96]">{icon}</div>
-      <span className="text-xs text-gray-400">{label}</span>
-      <span className="text-sm font-semibold text-gray-800">{value}</span>
+    <div className="min-w-0 rounded-lg border border-white/10 bg-[#071224] px-3 py-3">
+
+      <div className="flex items-center gap-2">
+
+        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-blue-400/10 text-blue-300">
+          {icon}
+        </div>
+
+        <div className="min-w-0">
+
+          <p className="text-[9px] text-slate-500">
+            {label}
+          </p>
+
+          <p className="mt-0.5 truncate text-[11px] font-semibold text-slate-200">
+            {value}
+          </p>
+
+        </div>
+
+      </div>
+
     </div>
   );
 }

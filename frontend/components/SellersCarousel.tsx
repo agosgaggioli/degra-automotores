@@ -35,24 +35,31 @@ interface Seller {
 const sellers: Seller[] = [
   {
     id: 's1',
-    name: 'Juan Pérez',
+    name: 'Lautaro Degra',
     role: 'Vendedor',
     photo: '/images/sellers/juan.jpeg',
-    whatsapp: '5493512345678',
+    whatsapp: '3463406181',
   },
   {
     id: 's2',
-    name: 'María López',
-    role: 'Vendedora',
+    name: 'Valentin Degra',
+    role: 'Vendedor',
     photo: '/images/sellers/juan.jpeg',
-    whatsapp: '5493512345679',
+    whatsapp: '3463412087',
   },
   {
     id: 's3',
-    name: 'Carlos Gómez',
+    name: 'Dario Degra',
     role: 'Vendedor',
     photo: '/images/sellers/juan.jpeg',
-    whatsapp: '5493512345680',
+    whatsapp: '3517358079',
+  },
+    {
+    id: 's3',
+    name: 'Marwan',
+    role: 'Vendedor',
+    photo: '/images/sellers/juan.jpeg',
+    whatsapp: '3513681188',
   },
 ];
 

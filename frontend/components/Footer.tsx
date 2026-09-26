@@ -62,7 +62,7 @@ const Footer = () => {
             <div className="mt-5 flex items-center gap-2">
 
               <a
-                href="https://instagram.com/drautomotores"
+                href="https://instagram.com/degraautomotores"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram de Degra Automotores"
@@ -87,7 +87,7 @@ const Footer = () => {
               </a>
 
               <a
-                href="https://wa.me/5493512345678"
+                href="https://wa.me/3463406181"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="WhatsApp de Degra Automotores"

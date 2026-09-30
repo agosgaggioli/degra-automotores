@@ -36,28 +36,28 @@ const history = [
     title: 'El comienzo',
     description:
       'Degra Automotores nace con una idea simple: hacer las cosas de otra manera. Empezamos desde abajo, con mucho trabajo, confianza y ganas de crecer.',
-    image: '/images/about/history-2017.jpg',
+    image: '/images/about/history-2017.jpeg',
   },
   {
     year: '2021',
     title: 'Crecimos con nuestros clientes',
     description:
       'Con cada operación fuimos sumando experiencia, clientes y nuevas oportunidades. El boca en boca y la confianza fueron claves para seguir avanzando.',
-    image: '/images/about/history-2021.jpg',
+    image: '/images/about/history-2021.jpeg',
   },
   {
     year: '2024',
     title: 'Un equipo cada vez más grande',
     description:
       'La agencia dejó de ser solo un lugar para comprar un vehículo. Empezamos a formar un equipo dedicado a acompañar cada operación de principio a fin.',
-    image: '/images/about/history-2024.jpg',
+    image: '/images/about/agencia.jpeg',
   },
   {
     year: 'Hoy',
     title: 'Seguimos creciendo',
     description:
       'Hoy seguimos con la misma esencia del primer día, pero con más experiencia, más herramientas y un objetivo claro: que comprar o vender un vehículo sea una buena experiencia.',
-    image: '/images/about/history-now.jpg',
+    image: '/images/about/history-hoy.jpeg',
   },
 ];
 
@@ -98,7 +98,7 @@ const values = [
 
 const stats = [
   {
-    value: '+500',
+    value: '+900',
     label: 'Operaciones realizadas',
   },
   {
@@ -106,7 +106,7 @@ const stats = [
     label: 'Años de experiencia',
   },
   {
-    value: '+300',
+    value: '+900',
     label: 'Clientes que confiaron',
   },
   {
@@ -319,7 +319,7 @@ export default function SobreNosotrosPage() {
             <div className="relative h-[290px] overflow-hidden rounded-2xl border border-white/10 sm:h-[360px] lg:h-[390px]">
 
               <Image
-                src="/images/about/equipo.jpg"
+                src="/images/about/equipo.jpeg"
                 alt="Equipo Degra Automotores"
                 fill
                 priority
@@ -683,7 +683,7 @@ export default function SobreNosotrosPage() {
           <div className="relative h-[300px] overflow-hidden rounded-2xl border border-white/10 sm:h-[360px]">
 
             <Image
-              src="/images/about/agencia.jpg"
+              src="/images/about/agencia.jpeg"
               alt="Degra Automotores"
               fill
               className="object-cover"

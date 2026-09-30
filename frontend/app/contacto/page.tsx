@@ -288,7 +288,7 @@ export default function ContactoPage() {
                   </p>
 
                   <p className="mt-0.5 font-semibold text-white">
-                    +54 9 351 234 5678
+                    3463406181
                   </p>
 
                 </div>
@@ -322,7 +322,7 @@ export default function ContactoPage() {
                   </p>
 
                   <p className="mt-0.5 font-semibold text-white">
-                    contacto@drautomotores.com
+                    degraautomotores@outlook.com
                   </p>
 
                 </div>

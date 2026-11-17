@@ -2,6 +2,11 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
+    // Las fotos se sirven directo desde Supabase, sin pasar por la optimización
+    // de Vercel (que en el plan gratis tiene un límite de 5.000 transformaciones).
+    // Para que no pesen, se comprimen en el navegador antes de subirlas
+    // (ver lib/compressImage.ts).
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
@@ -14,4 +19,3 @@ const nextConfig = {
 }
 
 module.exports = nextConfig;
-

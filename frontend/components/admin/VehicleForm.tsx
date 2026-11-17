@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { X, ImagePlus } from 'lucide-react';
 import { Vehicle, deleteVehicleImage } from '../../lib/api';
+import { compressImages } from '../../lib/compressImage';
 
 export interface VehicleFormValues {
   brand: string;
@@ -76,6 +77,7 @@ export default function VehicleForm({
   const [newImagePreviews, setNewImagePreviews] = useState<string[]>([]);
   const [images, setImages] = useState(existingImages);
   const [removingId, setRemovingId] = useState<string | null>(null);
+  const [compressing, setCompressing] = useState(false);
   const isNew = values.condition === 'new';
 
   // Cada vez que se usa el selector de archivos, cambiamos esta "key" para que
@@ -105,10 +107,14 @@ export default function VehicleForm({
     }));
   }
 
-  function handleFiles(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleFiles(e: React.ChangeEvent<HTMLInputElement>) {
     if (!e.target.files || e.target.files.length === 0) return;
     const selected = Array.from(e.target.files);
-    setNewImages((prev) => [...prev, ...selected]);
+    // Comprimimos las fotos antes de subirlas (ver lib/compressImage.ts)
+    setCompressing(true);
+    const compressed = await compressImages(selected);
+    setCompressing(false);
+    setNewImages((prev) => [...prev, ...compressed]);
     // Forzamos que el input se recree (ver comentario en fileInputKey) para
     // que la próxima vez que se abra el selector de archivos funcione bien,
     // incluso si es la segunda, tercera o décima vez.
@@ -273,7 +279,9 @@ export default function VehicleForm({
         <label className="mt-4 flex min-h-[110px] cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 py-6 text-center transition hover:border-[#1f4e96] hover:bg-[#1f4e96]/5">
           <ImagePlus size={24} className="text-[#1f4e96]" />
           <span className="mt-2 text-sm font-semibold text-[#071224]">Agregar imágenes</span>
-          <span className="text-xs text-gray-500">JPG, PNG o WEBP</span>
+          <span className="text-xs text-gray-500">
+            {compressing ? 'Optimizando fotos...' : 'JPG, PNG o WEBP · se optimizan solas al subirlas'}
+          </span>
           <input
             key={fileInputKey}
             type="file"
@@ -316,7 +324,7 @@ export default function VehicleForm({
 
       <button
         type="submit"
-        disabled={submitting}
+        disabled={submitting || compressing}
         className="rounded-xl bg-[#071224] px-6 py-3.5 font-semibold text-white transition hover:bg-[#1f4e96] disabled:cursor-not-allowed disabled:opacity-60"
       >
         {submitting ? 'Guardando...' : submitLabel}

@@ -10,9 +10,9 @@ export const metadata = {
   description:
     'Concesionaria Degra Automotores - Vehículos usados y financiamiento',
   icons: {
-    icon: '/images/favicon.png',
-    shortcut: '/images/favicon.png',
-    apple: '/images/favicon.png',
+    icon: '/images/favicon.jpg',
+    shortcut: '/images/favicon.jpg',
+    apple: '/images/favicon.jpg',
   },
 };
 

@@ -102,6 +102,7 @@ export default function AdminVehiclesPage() {
     fetchAdminVehicles({
       status,
       search,
+      condition: 'used',
       pageSize: 100,
     })
       .then((res) =>

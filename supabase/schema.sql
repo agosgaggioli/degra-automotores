@@ -40,10 +40,12 @@ create table if not exists vehicles (
   description text,
   status text not null default 'published', -- published | draft | sold
   featured boolean not null default false,
+  condition text not null default 'used' check (condition in ('used', 'new')), -- used | new (0km)
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
 
+create index if not exists idx_vehicles_condition on vehicles (condition);
 create index if not exists idx_vehicles_status on vehicles (status);
 create index if not exists idx_vehicles_brand on vehicles (brand);
 create index if not exists idx_vehicles_featured on vehicles (featured);

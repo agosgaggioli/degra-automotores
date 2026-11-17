@@ -18,6 +18,7 @@ export interface Vehicle {
   description: string | null;
   status: 'published' | 'draft' | 'sold';
   featured: boolean;
+  condition: 'used' | 'new';
   images: string[];
   created_at: string;
   updated_at: string;
@@ -131,6 +132,7 @@ export async function fetchVehicles(params: {
   yearMin?: number | '';
   yearMax?: number | '';
   featured?: boolean;
+  condition?: 'used' | 'new';
   page?: number;
   pageSize?: number;
 } = {}): Promise<Paginated<Vehicle>> {
@@ -149,8 +151,8 @@ export async function fetchFeaturedVehicles(pageSize = 3): Promise<Paginated<Veh
   return fetchVehicles({ featured: true, pageSize });
 }
 
-export async function fetchVehicleFilters(): Promise<VehicleFilters> {
-  const res = await fetch(`${API_URL}/vehicles/filters`, { cache: 'no-store' });
+export async function fetchVehicleFilters(condition: 'used' | 'new' = 'used'): Promise<VehicleFilters> {
+  const res = await fetch(`${API_URL}/vehicles/filters?condition=${condition}`, { cache: 'no-store' });
   return handleResponse<VehicleFilters>(res);
 }
 
@@ -217,6 +219,7 @@ export async function fetchStats() {
 export async function fetchAdminVehicles(params: {
   status?: string;
   search?: string;
+  condition?: 'used' | 'new';
   page?: number;
   pageSize?: number;
 } = {}): Promise<Paginated<Vehicle>> {

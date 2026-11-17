@@ -20,17 +20,22 @@ export interface VehicleFormValues {
   description: string;
   status: 'published' | 'draft' | 'sold';
   featured: boolean;
+  condition: 'used' | 'new';
 }
 
 const FUELS = ['Nafta', 'Diésel', 'GNC', 'Eléctrico', 'Híbrido'];
 const TRANSMISSIONS = ['Manual', 'Automática', 'Secuencial'];
 
-export function vehicleToFormValues(v?: Vehicle | null): VehicleFormValues {
+export function vehicleToFormValues(
+  v?: Vehicle | null,
+  condition: 'used' | 'new' = 'used',
+): VehicleFormValues {
+  const isNew = (v?.condition || condition) === 'new';
   return {
     brand: v?.brand || '',
     model: v?.model || '',
     version: v?.version || '',
-    year: v ? String(v.year) : '',
+    year: v ? String(v.year) : isNew ? String(new Date().getFullYear()) : '',
     mileage: v ? String(v.mileage) : '0',
     price: v ? String(v.price) : '',
     currency: v?.currency || 'ARS',
@@ -41,6 +46,7 @@ export function vehicleToFormValues(v?: Vehicle | null): VehicleFormValues {
     description: v?.description || '',
     status: v?.status || 'published',
     featured: v?.featured || false,
+    condition: v?.condition || condition,
   };
 }
 
@@ -70,6 +76,7 @@ export default function VehicleForm({
   const [newImagePreviews, setNewImagePreviews] = useState<string[]>([]);
   const [images, setImages] = useState(existingImages);
   const [removingId, setRemovingId] = useState<string | null>(null);
+  const isNew = values.condition === 'new';
 
   // Cada vez que se usa el selector de archivos, cambiamos esta "key" para que
   // React vuelva a crear el <input type="file"> desde cero. Esto evita un bug
@@ -136,7 +143,7 @@ export default function VehicleForm({
       className="space-y-6"
     >
       <section className="rounded-2xl border border-gray-200 bg-white p-6">
-        <h2 className="text-lg font-bold text-[#071224]">Datos del vehículo</h2>
+        <h2 className="text-lg font-bold text-[#071224]">{isNew ? 'Datos del 0km' : 'Datos del vehículo'}</h2>
         <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <Field label="Marca" required>
             <input name="brand" value={values.brand} onChange={handleChange} required className={inputClass} />
@@ -147,7 +154,7 @@ export default function VehicleForm({
           <Field label="Versión">
             <input name="version" value={values.version} onChange={handleChange} className={inputClass} />
           </Field>
-          <Field label="Año" required>
+          <Field label={isNew ? 'Año modelo' : 'Año'} required>
             <input
               type="number"
               name="year"
@@ -159,12 +166,16 @@ export default function VehicleForm({
               className={inputClass}
             />
           </Field>
-          <Field label="Kilometraje">
-            <input type="number" name="mileage" value={values.mileage} onChange={handleChange} min={0} className={inputClass} />
-          </Field>
-          <Field label="Patente / Dominio">
-            <input name="license_plate" value={values.license_plate} onChange={handleChange} className={inputClass} />
-          </Field>
+          {!isNew && (
+            <>
+              <Field label="Kilometraje">
+                <input type="number" name="mileage" value={values.mileage} onChange={handleChange} min={0} className={inputClass} />
+              </Field>
+              <Field label="Patente / Dominio">
+                <input name="license_plate" value={values.license_plate} onChange={handleChange} className={inputClass} />
+              </Field>
+            </>
+          )}
           <Field label="Color">
             <input name="color" value={values.color} onChange={handleChange} className={inputClass} />
           </Field>
@@ -207,7 +218,7 @@ export default function VehicleForm({
             <select name="status" value={values.status} onChange={handleChange} className={inputClass}>
               <option value="published">Publicado</option>
               <option value="draft">Borrador</option>
-              <option value="sold">Vendido</option>
+              {!isNew && <option value="sold">Vendido</option>}
             </select>
           </Field>
           <div className="flex items-center gap-2 pt-7">

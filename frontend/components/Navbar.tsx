@@ -30,6 +30,10 @@ const navigation = [
     href: '/vehiculos',
   },
   {
+    label: '0km',
+    href: '/0km',
+  },
+  {
     label: 'Financiación',
     href: '/financiacion',
   },

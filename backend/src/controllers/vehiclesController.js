@@ -19,6 +19,8 @@ const vehicleSchema = z.object({
   license_plate: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
   status: z.enum(['published', 'draft', 'sold']).default('published'),
+  // 'used' = usado (catálogo /vehiculos) | 'new' = 0km (catálogo /0km)
+  condition: z.enum(['used', 'new']).default('used'),
     featured: z
     .union([z.boolean(), z.string()])
     .transform((v) => v === true || v === 'true')
@@ -60,6 +62,7 @@ async function listPublic(req, res, next) {
       yearMin,
       yearMax,
       featured,
+      condition = 'used',
       page = '1',
       pageSize = '12',
     } = req.query;
@@ -75,6 +78,8 @@ async function listPublic(req, res, next) {
       .eq('status', 'published')
       .order('created_at', { ascending: false });
 
+    // Por defecto solo usados, así /vehiculos y la home no muestran los 0km
+    if (condition !== 'all') query = query.eq('condition', condition === 'new' ? 'new' : 'used');
     if (brand) query = query.eq('brand', brand);
     if (transmission) query = query.eq('transmission', transmission);
     if (fuel) query = query.eq('fuel', fuel);
@@ -123,10 +128,12 @@ async function listPublic(req, res, next) {
 // GET /api/vehicles/filters (público) - valores disponibles para los selects del catálogo
 async function getFilters(req, res, next) {
   try {
+    const condition = req.query.condition === 'new' ? 'new' : 'used';
     const { data, error } = await supabase
       .from('vehicles')
       .select('brand, transmission, fuel')
-      .eq('status', 'published');
+      .eq('status', 'published')
+      .eq('condition', condition);
     if (error) throw error;
 
     const uniq = (arr) => Array.from(new Set(arr.filter(Boolean))).sort();
@@ -173,7 +180,7 @@ async function getBySlug(req, res, next) {
 // GET /api/admin/vehicles (protegido) - incluye drafts y vendidos
 async function listAdmin(req, res, next) {
   try {
-    const { status = '', search = '', page = '1', pageSize = '20' } = req.query;
+    const { status = '', search = '', condition = '', page = '1', pageSize = '20' } = req.query;
 
     const pageNum = Math.max(parseInt(page, 10) || 1, 1);
     const size = Math.min(Math.max(parseInt(pageSize, 10) || 20, 1), 100);
@@ -186,6 +193,7 @@ async function listAdmin(req, res, next) {
       .order('created_at', { ascending: false });
 
     if (status) query = query.eq('status', status);
+    if (condition === 'new' || condition === 'used') query = query.eq('condition', condition);
     if (search) {
       query = query.or(`brand.ilike.%${search}%,model.ilike.%${search}%,version.ilike.%${search}%`);
     }
@@ -247,6 +255,10 @@ async function create(req, res, next) {
       return res.status(400).json({ error: parsed.error.errors[0].message });
     }
     const payload = parsed.data;
+    if (payload.condition === 'new') {
+      payload.mileage = 0;
+      payload.license_plate = null;
+    }
 
     const slug = await buildUniqueSlug(payload.brand, payload.model, payload.version, payload.year);
 
@@ -289,6 +301,11 @@ async function update(req, res, next) {
       .maybeSingle();
     if (findErr) throw findErr;
     if (!existing) return res.status(404).json({ error: 'Vehículo no encontrado.' });
+
+    if ((payload.condition || existing.condition) === 'new') {
+      payload.mileage = 0;
+      payload.license_plate = null;
+    }
 
     let slug = existing.slug;
     const brandChanged = payload.brand && payload.brand !== existing.brand;

@@ -7,12 +7,13 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 
-import { LayoutDashboard, Car, ClipboardList, MessageSquare, CreditCard, LogOut } from 'lucide-react';
+import { LayoutDashboard, Car, Sparkles, ClipboardList, MessageSquare, CreditCard, LogOut } from 'lucide-react';
 import { useAuth } from '../../lib/auth-context';
 
 const links = [
   { href: '/admin/dashboard', label: 'Inicio', icon: LayoutDashboard },
   { href: '/admin/vehiculos', label: 'Vehículos', icon: Car },
+  { href: '/admin/0km', label: '0km', icon: Sparkles },
   { href: '/admin/financiaciones', label: 'Financiaciones', icon: CreditCard },
   { href: '/admin/consignaciones', label: 'Consignaciones', icon: ClipboardList },
   { href: '/admin/consultas', label: 'Consultas', icon: MessageSquare },

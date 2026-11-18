@@ -30,6 +30,8 @@ import {
   Vehicle,
 } from '../../../lib/api';
 
+import ShareButton from '../../../components/ShareButton';
+
 const FALLBACK_IMG =
   '/images/vehicles/onix.jpeg';
 
@@ -705,6 +707,14 @@ export default function VehicleDetailPage() {
 
                 Consultar por WhatsApp
               </a>
+
+              {/* COMPARTIR */}
+
+              <ShareButton
+                className="mt-2"
+                title={`${vehicle.brand} ${vehicle.model} ${vehicle.year} | Degra Automotores`}
+                text={`Mirá este ${vehicle.brand} ${vehicle.model} ${vehicle.version || ''} ${vehicle.year} en Degra Automotores`}
+              />
 
             </div>
 

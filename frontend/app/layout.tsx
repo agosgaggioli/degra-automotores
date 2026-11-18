@@ -1,3 +1,10 @@
+import './globals.css';
+
+import React from 'react';
+import { Analytics } from '@vercel/analytics/react';
+
+import SiteLayout from '../components/SiteLayout';
+
 export const metadata = {
   metadataBase: new URL('https://www.degraautomotores.com.ar'),
   title: 'Degra Automotores',
@@ -18,3 +25,20 @@ export const metadata = {
     images: ['/images/favicon.jpg'],
   },
 };
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="es">
+      <body>
+        <SiteLayout>
+          {children}
+        </SiteLayout>
+        <Analytics />
+      </body>
+    </html>
+  );
+}
